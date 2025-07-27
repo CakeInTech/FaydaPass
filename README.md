@@ -105,7 +105,7 @@ Visit `http://localhost:3000` to see the application.
 
 ## 🎨 Design System
 
-- **Colors**: Green (#22c55e) and Blue (#3b82f6) theme
+- **Colors**: E43F6F and 24050E theme
 - **Typography**: Inter font family
 - **Spacing**: 8px grid system
 - **Components**: Shadcn/ui with custom styling
