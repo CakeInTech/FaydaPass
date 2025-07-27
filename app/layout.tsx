@@ -1,3 +1,4 @@
+import BackgroundWrapper from "@/components/BackgroundWrapper";
 import "./globals.css";
 import { Inter } from "next/font/google";
 
@@ -11,9 +12,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-primary-50">
-          {children}
-        </div>
+        <BackgroundWrapper>
+          <div className="min-h-screen">{children}
+
+          </div>
+        </BackgroundWrapper>
       </body>
     </html>
   );
