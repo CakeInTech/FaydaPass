@@ -36,12 +36,6 @@ const Navbar = () => {
       icon: Globe,
       description: "Live implementations",
     },
-    {
-      name: "Admin",
-      href: "/admin",
-      icon: Zap,
-      description: "Dashboard portal",
-    },
   ];
 
   return (
