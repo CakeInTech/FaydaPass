@@ -10,6 +10,8 @@
     --card-foreground: 345 85% 9%;
     --popover: 0 0% 100%;
     --popover-foreground: 345 85% 9%;
+    --primary: 345 76% 57%; /* #e43f6f */
+    --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96%;
     --secondary-foreground: 345 85% 9%;
     --muted: 210 40% 96%;
@@ -25,12 +27,14 @@
   }
 
   .dark {
-    --background: 345 85% 9%;
+    --background: 345 85% 9%; /* #24050e */
     --foreground: 210 40% 98%;
     --card: 345 85% 9%;
     --card-foreground: 210 40% 98%;
     --popover: 345 85% 9%;
     --popover-foreground: 210 40% 98%;
+    --primary: 345 76% 57%; /* #e43f6f */
+    --primary-foreground: 345 85% 9%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
@@ -58,25 +62,13 @@
   .gradient-mesh {
     background: linear-gradient(135deg, #e43f6f 0%, #24050e 100%);
     background-size: 400% 400%;
-    animation: gradientShift 8s ease infinite;
+    animation: gradient-shift 8s ease infinite;
   }
 
   .gradient-mesh-alt {
     background: linear-gradient(135deg, #e43f6f 0%, #f5a8be 50%, #24050e 100%);
     background-size: 400% 400%;
-    animation: gradientShift 10s ease infinite;
-  }
-
-  @keyframes gradientShift {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
+    animation: gradient-shift 10s ease infinite;
   }
 
   .floating-animation {
@@ -93,13 +85,36 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-20px);
-    }
+  /* Enhanced glass effects for navbar */
+  .navbar-glass {
+    background: rgba(36, 5, 14, 0.8); /* Your dark color with transparency */
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(228, 63, 111, 0.2); /* Your primary color */
+  }
+
+  .navbar-glass-light {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Gradient backgrounds that match your theme */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #e43f6f 0%, #f1768d 100%);
+  }
+
+  .bg-gradient-dark {
+    background: linear-gradient(135deg, #24050e 0%, #7f1742 100%);
+  }
+
+  .bg-gradient-hero {
+    background: linear-gradient(
+      135deg,
+      #24050e 0%,
+      #7f1742 25%,
+      #e43f6f 50%,
+      #7f1742 75%,
+      #24050e 100%
+    );
   }
 }
