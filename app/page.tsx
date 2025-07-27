@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Home from "@/components/Home";
-
 function HomePage() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -14,6 +13,7 @@ function HomePage() {
   return (
     <div className="min-h-screen">
       <Navbar />
+
       <Home isVisible={isVisible} />
       {/* Hero Section */}
 
