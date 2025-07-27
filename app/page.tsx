@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
+import DeveloperResources from "@/components/DeveloperResource";
+import Footer from "@/components/Footer";
 import Home from "@/components/Home";
+
+import Navbar from "@/components/Navbar";
+import { useEffect, useState } from "react";
 import Footer from "@/components/Footer";
 import BackgroundWrapper from "@/components/BackgroundWrapper";
 import Features from "@/components/Features";
+
 function HomePage() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -15,14 +19,21 @@ function HomePage() {
 
   return (
     <div className="min-h-screen">
-      <BackgroundWrapper>
-        <Navbar />
-        <Home isVisible={isVisible} />
-        {/* Features Section */}
-        <Features />
-        {/* Documentation */}
-        <Footer />
-      </BackgroundWrapper>
+
+           <BackgroundWrapper>
+      <Navbar />
+
+      <Home isVisible={isVisible} />
+      {/* Hero Section */}
+
+      {/* Features Section */}
+       <Features />
+      <DeveloperResources />
+      {/* Documentation */}
+      {/* Footer */}
+      <Footer/>
+        </BackgroundWrapper>
+
     </div>
   );
 }

@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import {
-  Shield,
+  ArrowRight,
   BookOpen,
+  Code,
+  Globe,
   Menu,
+  Shield,
   X,
   Zap,
-  Globe,
-  Code,
-  ArrowRight,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
