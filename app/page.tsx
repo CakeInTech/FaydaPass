@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Home from "@/components/Home";
 import Footer from "@/components/Footer";
 import BackgroundWrapper from "@/components/BackgroundWrapper";
+import Features from "@/components/Features";
 function HomePage() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -17,10 +18,9 @@ function HomePage() {
       <BackgroundWrapper>
         <Navbar />
         <Home isVisible={isVisible} />
-        {/* Hero Section */}
         {/* Features Section */}
+        <Features />
         {/* Documentation */}
-        {/* Footer */}
         <Footer />
       </BackgroundWrapper>
     </div>
