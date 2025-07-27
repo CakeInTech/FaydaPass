@@ -69,7 +69,7 @@ function HomePage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-white/30 text-white hover:bg-white/10"
+                  className="border-white/30 text-black hover:bg-white/10"
                 >
                   <BookOpen className="w-4 h-4 mr-2" />
                   Documentation
