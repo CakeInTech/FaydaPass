@@ -9,7 +9,6 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
