@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import {
   Badge,
   Sparkles,
@@ -234,14 +235,16 @@ const Home = ({ isVisible = true }: { isVisible?: boolean }) => {
               </div>
             </button>
 
-            <button className="group relative border-2 border-white/30 text-white px-10 py-5 text-lg font-bold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative flex items-center">
-                <Play className="mr-3 w-6 h-6" />
-                Try Live Demo
-                <div className="ml-2 w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              </div>
-            </button>
+            <Link href="/verify">
+              <button className="group relative border-2 border-white/30 text-white px-10 py-5 text-lg font-bold rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative flex items-center">
+                  <Shield className="mr-3 w-6 h-6" />
+                  Start Verification
+                  <ArrowRight className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" />
+                </div>
+              </button>
+            </Link>
           </div>
         </div>
 
@@ -296,86 +299,6 @@ const Home = ({ isVisible = true }: { isVisible?: boolean }) => {
           </div>
         </div>
       </div>
-
-      {/* Custom CSS Animations */}
-      <style jsx>{`
-        @keyframes gradient-shift {
-          0%,
-          100% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-        }
-
-        @keyframes orbit-0 {
-          from {
-            transform: rotate(0deg) translateX(60px) rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg) translateX(60px) rotate(-360deg);
-          }
-        }
-
-        @keyframes orbit-1 {
-          from {
-            transform: rotate(0deg) translateX(70px) rotate(0deg);
-          }
-          to {
-            transform: rotate(-360deg) translateX(70px) rotate(360deg);
-          }
-        }
-
-        @keyframes orbit-2 {
-          from {
-            transform: rotate(0deg) translateX(80px) rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg) translateX(80px) rotate(-360deg);
-          }
-        }
-
-        @keyframes float-icon-0 {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-20px) rotate(180deg);
-          }
-        }
-
-        @keyframes float-icon-1 {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-30px) rotate(-180deg);
-          }
-        }
-
-        @keyframes float-icon-2 {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-25px) rotate(90deg);
-          }
-        }
-
-        @keyframes float-icon-3 {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-35px) rotate(-90deg);
-          }
-        }
-      `}</style>
     </section>
   );
 };
