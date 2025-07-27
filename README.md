@@ -172,6 +172,17 @@ npm run build
 4. Add tests if applicable
 5. Submit a pull request
 
+## 👥 Authors <a name="authors"></a>
+<br>
+
+👤 **Mohamed Ibrahim**
+
+- GitHub: [@CakeInTech](https://github.com/CakeInTech)
+- LinkedIn: [Mohamed Ibrahim](https://www.linkedin.com/in/cakeintech/)
+
+👤 **Fetiya Yusuf**
+
+- GitHub: [@Fetiya Yusuf](https://github.com/fafiyusuf)
 ## 📄 License
 
 This project is licensed under the MIT License.
