@@ -1,11 +1,11 @@
 import {
   ArrowRight,
   BookOpen,
-  Code, // Added for floating icons
-  Cpu, // Added for floating icons
+  Code,
+  Cpu,
   Database,
   Github,
-  Lock, // Added for floating icons
+  Lock,
   Network,
   Terminal,
   Users,
@@ -14,8 +14,7 @@ import { useEffect, useRef, useState } from "react";
 
 const DeveloperResources = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const sectionRef = useRef<HTMLElement>(null); // Ref for the section to track mouse
-
+  const sectionRef = useRef<HTMLElement>(null); 
   // Mouse tracking for interactive background elements
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -161,7 +160,7 @@ const DeveloperResources = () => {
                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" />
               </div>
             </button>
-          </a>
+          </a>git
         </div>
       </div>
 
