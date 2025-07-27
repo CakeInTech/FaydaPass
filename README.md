@@ -13,7 +13,7 @@ A modern, responsive KYC onboarding web application built with Next.js, integrat
 
 ## 🚀 Tech Stack
 
-- **Next.js 13** (App Router)
+- **Next.js 14**
 - **TypeScript**
 - **TailwindCSS**
 - **Shadcn/ui Components**
