@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
+import DeveloperResources from "@/components/DeveloperResource";
+import Footer from "@/components/Footer";
 import Home from "@/components/Home";
+import Navbar from "@/components/Navbar";
+import { useEffect, useState } from "react";
 function HomePage() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -18,8 +20,10 @@ function HomePage() {
       {/* Hero Section */}
 
       {/* Features Section */}
+      <DeveloperResources />
       {/* Documentation */}
       {/* Footer */}
+      <Footer/>
     </div>
   );
 }
