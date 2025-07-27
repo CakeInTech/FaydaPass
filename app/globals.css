@@ -80,14 +80,13 @@
   }
 
   .glass-effect {
-    background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   /* Enhanced glass effects for navbar */
   .navbar-glass {
-    background: rgba(36, 5, 14, 0.8); /* Your dark color with transparency */
+    /* background: ; Your dark color with transparency */
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(228, 63, 111, 0.2); /* Your primary color */
   }
@@ -117,4 +116,29 @@
       #24050e 100%
     );
   }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+@keyframes float-slower {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(15px);
+  }
+}
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+.animate-float-slower {
+  animation: float-slower 12s ease-in-out infinite;
 }
