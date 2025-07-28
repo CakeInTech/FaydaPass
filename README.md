@@ -193,9 +193,9 @@ npm run build
 
 ## 📄 License
 
-👤 **Keyreh Ibrahim**
+👤 **Keyreh Husen**
 
-- GitHub: [Keyreh Ibrahim](https://github.com/keyreh)
+- GitHub: [Keyreh Husen](https://github.com/keyreh)
 
 ## 📄 License
 
