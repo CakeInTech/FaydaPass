@@ -44,6 +44,7 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 The application implements the complete Fayda eSignet OIDC flow according to official specifications:
 
 **Key Features:**
+
 - **PKCE Implementation**: Uses code_verifier and code_challenge for enhanced security
 - **Client Assertion**: JWT-based client authentication instead of client_secret
 - **Claims Management**: Configurable KYC data requests with essential/optional fields
@@ -52,6 +53,7 @@ The application implements the complete Fayda eSignet OIDC flow according to off
 - **Error Handling**: Comprehensive error handling for Fayda-specific error codes
 
 **OIDC Flow:**
+
 1. Authorization request with PKCE parameters and claims
 2. Callback handling with state validation
 3. Token exchange using client assertion and code verifier
@@ -61,6 +63,7 @@ The application implements the complete Fayda eSignet OIDC flow according to off
 **Note**: The current implementation uses a mock client assertion for demonstration. In production, you'll need to implement proper JWT signing with your private key.
 
 ### Week 1 (Hackathon Week)
+
 - [x] Setup `Next.js` project with App Router
 - [x] Integrate Fayda OIDC login (via redirect)
 - [x] Display fetched user data after verification
@@ -69,6 +72,7 @@ The application implements the complete Fayda eSignet OIDC flow according to off
 - [x] Setup database schema for KYC entries
 
 ### Additional Features Implemented
+
 - [x] Comprehensive admin dashboard with analytics
 - [x] User detail pages with consent tracking
 - [x] Data export functionality (JSON/CSV)
@@ -119,6 +123,7 @@ Visit `http://localhost:3000` to see the application.
 ## 📚 Developer Documentation
 
 Visit `/docs` for comprehensive integration guides including:
+
 - Quick start guide with code examples
 - SDK documentation for React, Node.js, and vanilla JavaScript
 - Complete API reference
@@ -128,6 +133,7 @@ Visit `/docs` for comprehensive integration guides including:
 ## 🚀 Deployment
 
 The application is configured for static export and can be deployed to:
+
 - Vercel
 - Netlify
 - Any static hosting provider
@@ -153,16 +159,16 @@ npm run build
 
 ## 📋 Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `NEXT_PUBLIC_CLIENT_ID` | Fayda eSignet client ID | Yes |
-| `NEXT_PUBLIC_REDIRECT_URI` | OAuth redirect URI | Yes |
-| `NEXT_PUBLIC_AUTHORIZATION_ENDPOINT` | Fayda authorization endpoint | Yes |
-| `NEXT_PUBLIC_TOKEN_ENDPOINT` | Fayda token endpoint | Yes |
-| `NEXT_PUBLIC_USERINFO_ENDPOINT` | Fayda userinfo endpoint | Yes |
-| `NEXT_PUBLIC_ALGORITHM` | JWT signing algorithm | Yes |
-| `NEXT_PUBLIC_CLIENT_ASSERTION_TYPE` | OAuth client assertion type | Yes |
-| `NEXT_PUBLIC_BASE_URL` | Application base URL | Yes |
+| Variable                             | Description                  | Required |
+| ------------------------------------ | ---------------------------- | -------- |
+| `NEXT_PUBLIC_CLIENT_ID`              | Fayda eSignet client ID      | Yes      |
+| `NEXT_PUBLIC_REDIRECT_URI`           | OAuth redirect URI           | Yes      |
+| `NEXT_PUBLIC_AUTHORIZATION_ENDPOINT` | Fayda authorization endpoint | Yes      |
+| `NEXT_PUBLIC_TOKEN_ENDPOINT`         | Fayda token endpoint         | Yes      |
+| `NEXT_PUBLIC_USERINFO_ENDPOINT`      | Fayda userinfo endpoint      | Yes      |
+| `NEXT_PUBLIC_ALGORITHM`              | JWT signing algorithm        | Yes      |
+| `NEXT_PUBLIC_CLIENT_ASSERTION_TYPE`  | OAuth client assertion type  | Yes      |
+| `NEXT_PUBLIC_BASE_URL`               | Application base URL         | Yes      |
 
 ## 🤝 Contributing
 
@@ -173,16 +179,24 @@ npm run build
 5. Submit a pull request
 
 ## 👥 Authors <a name="authors"></a>
+
 <br>
 
 👤 **Mohamed Ibrahim**
 
-- GitHub: [@CakeInTech](https://github.com/CakeInTech)
+- GitHub: [Mohamed Ibrahim](https://github.com/CakeInTech)
 - LinkedIn: [Mohamed Ibrahim](https://www.linkedin.com/in/cakeintech/)
 
 👤 **Fetiya Yusuf**
 
-- GitHub: [@Fetiya Yusuf](https://github.com/fafiyusuf)
+- GitHub: [Fetiya Yusuf](https://github.com/fafiyusuf)
+
+## 📄 License
+
+👤 **Fetiya Yusuf**
+
+- GitHub: [Keyreh Ibrahim](https://github.com/keyreh)
+
 ## 📄 License
 
 This project is licensed under the MIT License.
