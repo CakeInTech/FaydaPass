@@ -160,7 +160,7 @@ const DeveloperResources = () => {
                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" />
               </div>
             </button>
-          </a>git
+          </a>
         </div>
       </div>
 
