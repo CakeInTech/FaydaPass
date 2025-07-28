@@ -193,7 +193,7 @@ npm run build
 
 ## 📄 License
 
-👤 **Fetiya Yusuf**
+👤 **Keyreh Ibrahim**
 
 - GitHub: [Keyreh Ibrahim](https://github.com/keyreh)
 
