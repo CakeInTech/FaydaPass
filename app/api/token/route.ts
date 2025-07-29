@@ -110,7 +110,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: "Failed to create client assertion",
-          details: jwtError.message,
+          details:
+            jwtError instanceof Error ? jwtError.message : "Unknown JWT error",
         },
         { status: 500 }
       );

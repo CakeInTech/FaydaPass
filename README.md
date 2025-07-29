@@ -2,6 +2,49 @@
 
 A modern, responsive KYC onboarding web application built with Next.js, integrating with Fayda's eSignet OIDC system for secure Ethiopian identity verification.
 
+## 👥 Contributors
+
+- **Mohamed Ibrahim** - Lead Developer ([@CakeInTech](https://github.com/CakeInTech))
+- **Fetiya Yusuf** - Developer ([@fafiyusuf](https://github.com/fafiyusuf))
+- **Keyreh Husen** - Developer ([@keyreh](https://github.com/keyreh))
+
+## 🎯 Project Synopsis
+
+### Problem Statement
+
+Ethiopian businesses and organizations face significant challenges in verifying user identities securely and efficiently. Traditional KYC processes are:
+
+- **Time-consuming**: Manual verification takes days or weeks
+- **Expensive**: High operational costs for identity verification
+- **Insecure**: Vulnerable to fraud and identity theft
+- **Inaccessible**: Limited access to government-verified identity data
+
+### Planned Solution
+
+FaydaPass provides a **developer-first KYC API platform** that:
+
+- **Integrates with Fayda eSignet**: Leverages Ethiopia's national ID infrastructure
+- **Offers simple API integration**: 3-line code implementation for developers
+- **Ensures bank-grade security**: OAuth 2.0 + OIDC with PKCE and client assertions
+- **Provides real-time verification**: Complete KYC process in under 60 seconds
+- **Supports multiple use cases**: Banking, fintech, e-commerce, government services
+
+### Expected Outcome
+
+- **For Developers**: Easy-to-integrate KYC solution that reduces development time from months to minutes
+- **For Businesses**: Reduced fraud, lower operational costs, and improved user experience
+- **For Users**: Secure, fast, and seamless identity verification process
+- **For Ethiopia**: Increased digital inclusion and economic participation
+
+### Fayda's Role
+
+FaydaPass is **powered by Fayda eSignet**, Ethiopia's official digital identity platform. This integration:
+
+- **Ensures authenticity**: Direct connection to government-verified identity data
+- **Complies with regulations**: Meets Ethiopian digital identity standards
+- **Provides scalability**: Leverages existing national infrastructure
+- **Enables innovation**: Allows developers to build on top of verified identity data
+
 ## 🌟 Features
 
 - **✅ Complete OIDC Integration**: Full OAuth 2.0 flow with Fayda eSignet working end-to-end
@@ -15,13 +58,33 @@ A modern, responsive KYC onboarding web application built with Next.js, integrat
 
 ## 🚀 Tech Stack
 
-- **Next.js 14** with App Router
-- **TypeScript** for type safety
-- **TailwindCSS** for styling
-- **Shadcn/ui Components** for UI elements
-- **Lucide React Icons** for iconography
-- **Jose** for JWT handling
-- **PKCE** implementation for OAuth security
+### Frontend & UI
+
+- **Next.js 14** with App Router for server-side rendering and routing
+- **TypeScript** for type safety and better developer experience
+- **TailwindCSS** for utility-first styling and responsive design
+- **Shadcn/ui Components** for consistent, accessible UI components
+- **Lucide React Icons** for modern, scalable iconography
+
+### Backend & Security
+
+- **Node.js** runtime environment
+- **Jose** library for JWT handling and cryptographic operations
+- **PKCE** (Proof Key for Code Exchange) for OAuth 2.0 security
+- **OAuth 2.0 + OIDC** for industry-standard authentication
+
+### DevOps & Deployment
+
+- **Docker** for containerization and consistent deployment
+- **Docker Compose** for multi-service orchestration
+- **Nginx** (optional) for reverse proxy and load balancing
+- **GitHub Actions** (planned) for CI/CD automation
+
+### Integration
+
+- **Fayda eSignet OIDC** for Ethiopian national ID verification
+- **RESTful APIs** for seamless third-party integrations
+- **Session Storage** for secure client-side token management
 
 ## 🎯 Current Status
 
@@ -53,10 +116,18 @@ A modern, responsive KYC onboarding web application built with Next.js, integrat
    - ✅ Proper error handling for OAuth flows
 
 4. **Admin Dashboard**
+
    - ✅ User management interface
    - ✅ Analytics and statistics
    - ✅ User detail pages
    - ✅ Data export functionality
+
+5. **DevOps & Deployment**
+   - ✅ Docker containerization
+   - ✅ Production-ready Dockerfile
+   - ✅ Health check endpoint
+   - ✅ Automated deployment script
+   - ✅ Docker Compose configuration
 
 ### 🔧 Technical Achievements
 
@@ -67,7 +138,26 @@ A modern, responsive KYC onboarding web application built with Next.js, integrat
 
 ## 🛠 Setup Instructions
 
-### 1. Environment Configuration
+### Option 1: Docker (Recommended)
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/faydapass.git
+cd faydapass
+
+# Create environment file
+cp .env.example .env.local
+# Edit .env.local with your Fayda credentials
+
+# Build and run with Docker
+docker-compose up --build
+
+# Access the application at http://localhost:3000
+```
+
+### Option 2: Local Development
+
+#### 1. Environment Configuration
 
 Create a `.env.local` file with the following Fayda eSignet OIDC configuration:
 
@@ -90,7 +180,7 @@ CLIENT_ASSERTION_TYPE=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
 PRIVATE_KEY=[Your base64-encoded JWK private key]
 ```
 
-### 2. Installation & Development
+#### 2. Installation & Development
 
 ```bash
 # Install dependencies
@@ -104,6 +194,22 @@ npm run build
 ```
 
 Visit `http://localhost:3000` to see the application.
+
+### Docker Commands
+
+```bash
+# Build the Docker image
+docker build -t faydapass .
+
+# Run the container
+docker run -p 3000:3000 --env-file .env.local faydapass
+
+# Run with Docker Compose (development)
+docker-compose up
+
+# Run with Docker Compose (production)
+docker-compose --profile production up -d
+```
 
 ### 3. Testing the Integration
 

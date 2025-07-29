@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   try {
     console.log("=== USERINFO REQUEST START ===");
@@ -29,7 +31,12 @@ export async function GET(request: NextRequest) {
         console.log("Access token payload:", payload);
       }
     } catch (decodeError) {
-      console.log("Could not decode access token as JWT:", decodeError.message);
+      console.log(
+        "Could not decode access token as JWT:",
+        decodeError instanceof Error
+          ? decodeError.message
+          : "Unknown decode error"
+      );
     }
 
     const userinfoEndpoint = process.env.NEXT_PUBLIC_USERINFO_ENDPOINT;
@@ -51,7 +58,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Try different approaches to fix the 401 error
-    const attempts = [
+    const attempts: RequestInit[] = [
       // Attempt 1: POST request (some OIDC providers require POST)
       {
         method: "POST",

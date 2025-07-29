@@ -17,7 +17,11 @@ interface JWTPayload {
 
 // Base64 decode the private key
 function getPrivateKey(): string {
-  const privateKeyB64 = process.env.PRIVATE_KEY_BASE64_B64;
+  const privateKeyB64 = process.env.PRIVATE_KEY_BASE64;
+  if (!privateKeyB64) {
+    throw new Error("PRIVATE_KEY_BASE64 environment variable is not set");
+  }
+
   try {
     const decodedKey = Buffer.from(privateKeyB64, "base64").toString("utf-8");
     const jwk = JSON.parse(decodedKey);
