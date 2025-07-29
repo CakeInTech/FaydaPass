@@ -36,7 +36,7 @@ export default function VerifyPage() {
         code_challenge_method: "S256",
         state: state,
         nonce: generateCodeVerifier(), // Random nonce
-        claims_locales: "en am", // Changed from ui_locales to claims_locales as per documentation
+        ui_locales: "en", // Simplified to just English
         acr_values:
           "mosip:idp:acr:generated-code mosip:idp:acr:biometrics mosip:idp:acr:static-code",
       });

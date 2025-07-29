@@ -12,8 +12,18 @@ export default function CallbackPage() {
   );
   const [error, setError] = useState<string>("");
   const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
+    // Set processing flag immediately to prevent duplicate execution
+    if (isProcessing) {
+      console.log("Already processing callback, skipping...");
+      return;
+    }
+
+    setIsProcessing(true);
+    console.log("Setting isProcessing to true");
+
     const handleCallback = async () => {
       try {
         console.log("=== CALLBACK HANDLING START ===");
@@ -24,7 +34,11 @@ export default function CallbackPage() {
 
         if (oauthError) {
           console.error("OAuth error:", oauthError, errorDescription);
-          setError(`OAuth Error: ${errorDescription || oauthError}`);
+          setError(
+            `OAuth Error: ${oauthError} - ${decodeURIComponent(
+              errorDescription || oauthError
+            )}`
+          );
           setStatus("error");
           return;
         }
@@ -124,10 +138,13 @@ export default function CallbackPage() {
           "Access token received:",
           tokenData.access_token?.substring(0, 20) + "..."
         );
+        console.log("Full token response:", tokenData);
+
         setStatus("success");
 
         // Store basic success data
         sessionStorage.setItem("access_token", tokenData.access_token);
+        console.log("Stored access token in sessionStorage");
         sessionStorage.setItem("verification_success", "true");
 
         // Clean up OAuth state
@@ -142,11 +159,14 @@ export default function CallbackPage() {
         console.error("Callback error:", err);
         setError(err instanceof Error ? err.message : "Unknown error occurred");
         setStatus("error");
+      } finally {
+        // Don't reset isProcessing here to prevent re-execution
+        console.log("Callback handling completed");
       }
     };
 
     handleCallback();
-  }, [searchParams, router]);
+  }, [searchParams, router, isProcessing]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50">
