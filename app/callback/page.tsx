@@ -67,8 +67,12 @@ export default function CallbackPage() {
         }
 
         // Check environment variables in client
-        const clientId = "crXYIYg2cJiNTaw5t-peoPzCRo-3JATNfBd5A86U8t0";
-        const redirectUri = "http://localhost:3000/callback";
+        const clientId =
+          process.env.NEXT_PUBLIC_CLIENT_ID ||
+          "crXYIYg2cJiNTaw5t-peoPzCRo-3JATNfBd5A86U8t0";
+        const redirectUri =
+          process.env.NEXT_PUBLIC_REDIRECT_URI ||
+          "http://localhost:3000/callback";
 
         console.log("Environment variables:", {
           clientId: clientId,
@@ -116,6 +120,10 @@ export default function CallbackPage() {
         }
 
         console.log("✅ Tokens received successfully");
+        console.log(
+          "Access token received:",
+          tokenData.access_token?.substring(0, 20) + "..."
+        );
         setStatus("success");
 
         // Store basic success data

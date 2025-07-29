@@ -25,19 +25,26 @@ export default function VerifyPage() {
       // Build authorization URL
       const params = new URLSearchParams({
         response_type: "code",
-        client_id: "crXYIYg2cJiNTaw5t-peoPzCRo-3JATNfBd5A86U8t0",
-        redirect_uri: "http://localhost:3000/callback",
+        client_id:
+          process.env.NEXT_PUBLIC_CLIENT_ID ||
+          "crXYIYg2cJiNTaw5t-peoPzCRo-3JATNfBd5A86U8t0",
+        redirect_uri:
+          process.env.NEXT_PUBLIC_REDIRECT_URI ||
+          "http://localhost:3000/callback",
         scope: "openid profile email phone address",
         code_challenge: codeChallenge,
         code_challenge_method: "S256",
         state: state,
         nonce: generateCodeVerifier(), // Random nonce
-        ui_locales: "en",
+        claims_locales: "en am", // Changed from ui_locales to claims_locales as per documentation
         acr_values:
           "mosip:idp:acr:generated-code mosip:idp:acr:biometrics mosip:idp:acr:static-code",
       });
 
-      const authUrl = `https://esignet.ida.fayda.et/authorize?${params.toString()}`;
+      const authUrl = `${
+        process.env.NEXT_PUBLIC_AUTHORIZATION_ENDPOINT ||
+        "https://esignet.ida.fayda.et/authorize"
+      }?${params.toString()}`;
 
       console.log("Redirecting to:", authUrl);
 
