@@ -1,98 +1,60 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { ArrowLeft, Shield, CheckCircle, Lock, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  generateCodeVerifier,
-  generateCodeChallenge,
-  generateState,
-} from "@/lib/pkce";
+import { Smartphone, CheckCircle, Lock, Loader2 } from "lucide-react";
 import BackgroundWrapper from "@/components/BackgroundWrapper";
+import { generateCodeVerifier, generateCodeChallenge } from "@/lib/pkce";
 
 export default function VerifyPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFaydaLogin = async () => {
-    setIsLoading(true);
-    const codeVerifier = generateCodeVerifier();
-    const codeChallenge = await generateCodeChallenge(codeVerifier);
-    const state = generateState();
+    try {
+      setIsLoading(true);
 
-    sessionStorage.setItem("code_verifier", codeVerifier);
-    sessionStorage.setItem("oauth_state", state);
+      // Generate PKCE parameters
+      const codeVerifier = generateCodeVerifier();
+      const codeChallenge = await generateCodeChallenge(codeVerifier);
+      const state = generateCodeVerifier(); // Use same function for random state
 
-    const clientId = process.env.NEXT_PUBLIC_CLIENT_ID!;
-    const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI!;
-    const authorizationEndpoint =
-      process.env.NEXT_PUBLIC_AUTHORIZATION_ENDPOINT!;
+      // Store PKCE parameters
+      sessionStorage.setItem("code_verifier", codeVerifier);
+      sessionStorage.setItem("oauth_state", state);
 
-    const claims = {
-      userinfo: {
-        name: { essential: true },
-        phone_number: { essential: true },
-        email: { essential: true },
-        picture: { essential: false },
-        gender: { essential: false },
-        birthdate: { essential: false },
-        address: { essential: false },
-      },
-      id_token: {},
-    };
+      // Build authorization URL
+      const params = new URLSearchParams({
+        response_type: "code",
+        client_id: "crXYIYg2cJiNTaw5t-peoPzCRo-3JATNfBd5A86U8t0",
+        redirect_uri: "http://localhost:3000/callback",
+        scope: "openid profile email phone address",
+        code_challenge: codeChallenge,
+        code_challenge_method: "S256",
+        state: state,
+        nonce: generateCodeVerifier(), // Random nonce
+        ui_locales: "en",
+        acr_values:
+          "mosip:idp:acr:generated-code mosip:idp:acr:biometrics mosip:idp:acr:static-code",
+      });
 
-    const authUrl = new URL(authorizationEndpoint);
-    authUrl.searchParams.set("client_id", clientId);
-    authUrl.searchParams.set("redirect_uri", redirectUri);
-    authUrl.searchParams.set("scope", "openid profile email");
-    authUrl.searchParams.set("response_type", "code");
-    authUrl.searchParams.set("state", state);
-    authUrl.searchParams.set("code_challenge", codeChallenge);
-    authUrl.searchParams.set("code_challenge_method", "S256");
-    authUrl.searchParams.set("claims", JSON.stringify(claims));
-    authUrl.searchParams.set("claims_locales", "en am");
+      const authUrl = `https://esignet.ida.fayda.et/authorize?${params.toString()}`;
 
-    if (!clientId || !authorizationEndpoint || !redirectUri) {
-      alert("Missing configuration");
+      console.log("Redirecting to:", authUrl);
+
+      // Redirect to Fayda
+      window.location.href = authUrl;
+    } catch (error) {
+      console.error("OAuth initiation failed:", error);
       setIsLoading(false);
-      return;
+      alert("Failed to initiate verification. Please try again.");
     }
-
-    window.location.href = authUrl.toString();
   };
 
   return (
     <BackgroundWrapper>
       <div className="min-h-screen py-32 px-4 flex items-center justify-center bg-transparent relative">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute w-[60rem] h-[60rem] bg-blue-500/10 blur-3xl rounded-full -top-40 -left-40 animate-pulse-slow" />
-          <div className="absolute w-[40rem] h-[40rem] bg-green-400/10 blur-2xl rounded-full -bottom-20 right-0 animate-pulse-slower" />
-        </div>
-
         <div className="relative z-10 w-full max-w-6xl bg-white/10 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/10 p-10">
-          <div className="flex justify-between items-center mb-8">
-            <Link
-              href="/"
-              className="flex items-center text-white/80 hover:text-white transition"
-            >
-              <ArrowLeft className="w-5 h-5 mr-2" /> Back to Home
-            </Link>
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-white font-semibold text-lg">
-                FaydaPass
-              </span>
-            </div>
-          </div>
-
           <div className="text-center mb-12">
-            <div className="floating-animation inline-block mb-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-2xl">
-                <Shield className="w-10 h-10 text-white" />
-              </div>
-            </div>
             <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6">
               Complete Your KYC Verification
             </h1>
@@ -106,34 +68,32 @@ export default function VerifyPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
               <h2 className="text-2xl font-bold text-white mb-6">
-                How It Works
+                How it Works
               </h2>
               <ul className="space-y-6">
                 {[
-                  "Connect with Fayda",
-                  "Instant Verification",
-                  "Get Verified",
-                ].map((title, idx) => (
+                  {
+                    title: "Connect with Fayda",
+                    desc: "Securely connect to the Ethiopian national identity system",
+                  },
+                  {
+                    title: "Instant Verification",
+                    desc: "Your identity is verified in real-time using biometric data",
+                  },
+                  {
+                    title: "Get Verified",
+                    desc: "Receive your verification certificate and access services",
+                  },
+                ].map((step, idx) => (
                   <li key={idx} className="flex items-start space-x-4">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center mt-1 text-sm font-bold text-white bg-opacity-20`}
-                      style={{
-                        backgroundColor: ["#10b981", "#3b82f6", "#8b5cf6"][idx],
-                      }}
-                    >
+                    <div className="flex-shrink-0 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                       {idx + 1}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white mb-1">{title}</h3>
-                      <p className="text-white/70 text-sm">
-                        {
-                          [
-                            "Securely log in using your Fayda digital identity",
-                            "Your identity is verified using official government data",
-                            "Receive your verification status and continue onboarding",
-                          ][idx]
-                        }
-                      </p>
+                      <h3 className="text-lg font-semibold text-white">
+                        {step.title}
+                      </h3>
+                      <p className="text-white/70 mt-1">{step.desc}</p>
                     </div>
                   </li>
                 ))}
@@ -157,16 +117,16 @@ export default function VerifyPage() {
                   </li>
                 ))}
               </ul>
+
               <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                 <div className="flex items-start space-x-3">
                   <Lock className="w-5 h-5 text-blue-300 mt-0.5" />
                   <div>
                     <p className="text-sm text-white font-medium">
-                      Your Data is Protected
+                      Test Credentials
                     </p>
                     <p className="text-sm text-white/70 mt-1">
-                      FaydaPass uses bank-level security protocols and never
-                      stores your personal information.
+                      FIN: 6140798523917519 | OTP: 111111
                     </p>
                   </div>
                 </div>
@@ -183,12 +143,13 @@ export default function VerifyPage() {
             >
               {isLoading ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                  <Loader2 className="animate-spin w-5 h-5 mr-3" />
                   Connecting to Fayda...
                 </>
               ) : (
                 <>
-                  <Smartphone className="w-5 h-5 mr-3" /> Continue with Fayda
+                  <Smartphone className="w-5 h-5 mr-3" />
+                  Continue with Fayda
                 </>
               )}
             </Button>
