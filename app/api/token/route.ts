@@ -7,56 +7,35 @@ async function createClientAssertion(
 ): Promise<string> {
   const { SignJWT, importJWK } = await import("jose");
 
-  let privateKey;
-  try {
-    // Decode the base64 encoded JWK
-    const decoded = Buffer.from(privateKeyJWK, "base64").toString("utf-8");
-    privateKey = JSON.parse(decoded);
-    console.log("Private key parsed successfully, kid:", privateKey.kid);
-  } catch (parseError) {
-    console.error("Failed to parse private key:", parseError);
-    throw new Error("Failed to parse private key JSON");
-  }
+  // Decode the base64 encoded JWK (same as GitHub example)
+  const jwkJson = Buffer.from(privateKeyJWK, "base64").toString();
+  const jwk = JSON.parse(jwkJson);
+  const privateKey = await importJWK(jwk, "RS256");
 
-  let key;
-  try {
-    key = await importJWK(privateKey, "RS256");
-    console.log("JWK imported successfully");
-  } catch (importError) {
-    console.error("Failed to import JWK:", importError);
-    throw new Error(`Failed to import JWK: ${importError.message}`);
-  }
+  // Simple header without kid (matching GitHub example)
+  const header = {
+    alg: "RS256",
+    typ: "JWT",
+  };
 
-  const now = Math.floor(Date.now() / 1000);
-  const jti = `${clientId}-${now}-${Math.random().toString(36).substring(2)}`;
-
+  // Simple payload (matching GitHub example)
   const payload = {
     iss: clientId,
     sub: clientId,
     aud: tokenEndpoint,
-    jti,
-    iat: now,
-    exp: now + 15 * 60, // 15 minutes as per Fayda documentation
-  };
-
-  const header = {
-    alg: "RS256",
-    typ: "JWT",
-    kid: privateKey.kid,
   };
 
   console.log("JWT payload:", payload);
   console.log("JWT header:", header);
 
-  let jwt;
-  try {
-    jwt = await new SignJWT(payload).setProtectedHeader(header).sign(key);
-    console.log("JWT signed successfully");
-  } catch (signError) {
-    console.error("Failed to sign JWT:", signError);
-    throw new Error(`Failed to sign JWT: ${signError.message}`);
-  }
+  // Create JWT using Jose's built-in methods (matching GitHub example)
+  const jwt = await new SignJWT(payload)
+    .setProtectedHeader(header)
+    .setIssuedAt()
+    .setExpirationTime("2h")
+    .sign(privateKey);
 
+  console.log("JWT signed successfully");
   return jwt;
 }
 
@@ -86,16 +65,30 @@ export async function POST(request: NextRequest) {
     // Check environment variables
     const tokenEndpoint = process.env.TOKEN_ENDPOINT;
     const clientAssertionType = process.env.CLIENT_ASSERTION_TYPE;
-    const privateKeyBase64 = process.env.PRIVATE_KEY; // Changed from PRIVATE_KEY_BASE64
+    const privateKeyBase64 = process.env.PRIVATE_KEY;
 
     console.log("Environment check:", {
       tokenEndpoint: !!tokenEndpoint,
       clientAssertionType: !!clientAssertionType,
       privateKeyBase64: !!privateKeyBase64,
+      tokenEndpointValue: tokenEndpoint?.substring(0, 50),
+      clientAssertionTypeValue: clientAssertionType?.substring(0, 50),
+      privateKeyValue: privateKeyBase64?.substring(0, 20),
     });
 
     if (!tokenEndpoint || !clientAssertionType || !privateKeyBase64) {
-      console.error("Missing environment variables");
+      console.error("Missing environment variables:", {
+        TOKEN_ENDPOINT: !!tokenEndpoint,
+        CLIENT_ASSERTION_TYPE: !!clientAssertionType,
+        PRIVATE_KEY: !!privateKeyBase64,
+        allEnvVars: Object.keys(process.env).filter(
+          (key) =>
+            key.includes("TOKEN") ||
+            key.includes("CLIENT") ||
+            key.includes("PRIVATE") ||
+            key.includes("ASSERTION")
+        ),
+      });
       return NextResponse.json(
         { error: "Server configuration error - missing environment variables" },
         { status: 500 }
