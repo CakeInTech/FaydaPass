@@ -1,98 +1,103 @@
-"use client";
+"use client"
 
-import DocsBackgroundWrapper from "@/components/docs/DocsBackgroundWrapper";
-import Footer from "@/components/docs/DocsFooter";
-import { DocsLayout } from "@/components/docs/DocsLayout";
-import DocsNavbar from "@/components/docs/DocsNavbar"; // Using DocsNavbar
-import { DocsPageHeader } from "@/components/docs/DocsPageHeader";
-import { MdxComponents } from "@/components/docs/MdxComponents";
+import DocsBackgroundWrapper from "@/components/docs/DocsBackgroundWrapper"
+import Footer from "@/components/docs/DocsFooter"
+import { DocsLayout } from "@/components/docs/DocsLayout"
+import DocsNavbar from "@/components/docs/DocsNavbar"
+import { DocsPageHeader } from "@/components/docs/DocsPageHeader"
+import { DocsSidebar } from "@/components/docs/DocsSidebar"
+import { MdxComponents } from "@/components/docs/MdxComponents"
 
-export default function DocsPage() {
+const headings = [
+  { id: "about-faydapass", title: "About FaydaPass" },
+  { id: "flexible-and-easy-to-use", title: "Flexible & Easy to Use" },
+  { id: "own-your_own-data", title: "Own Your Own Data" },
+  { id: "secure-by-default", title: "Secure by Default" },
+  { id: "credits", title: "Credits" },
+  { id: "getting-started-next-steps", title: "Getting Started" },
+]
+
+export default function Page() {
   return (
     <DocsBackgroundWrapper>
-      <DocsNavbar /> {/* Fixed navbar at the top */}
-      <DocsLayout> {/* Contains the fixed sidebar and scrollable main content */}
+      <DocsNavbar />
+      <DocsSidebar headings={headings} />
+      <DocsLayout>
         <DocsPageHeader
           heading="Introduction"
           text="FaydaPass is a complete open-source authentication solution for Next.js applications."
         />
 
-        {/* MDX Content - styled via MdxComponents */}
-        <MdxComponents.h2 id="about-faydapass">About FaydaPass</MdxComponents.h2>
-        <MdxComponents.p>
-          FaydaPass is a complete open-source authentication solution for Next.js
-          applications. It is designed from the ground up to support Next.js and
-          Serverless.
-        </MdxComponents.p>
-        <MdxComponents.p>
-          Check out the{" "}
-          <a href="/code-examples">example code</a> to see how easy
-          it is to use FaydaPass for authentication.
-        </MdxComponents.p>
+        {/* MDX Content */}
+        <section id="about-faydapass">
+          <MdxComponents.h2>About FaydaPass</MdxComponents.h2>
+          <MdxComponents.p>
+            FaydaPass is a complete open-source authentication solution for{" "}
+            <MdxComponents.a href="https://nextjs.org">Next.js</MdxComponents.a> applications.
+          </MdxComponents.p>
+          <MdxComponents.p>It is designed from the ground up to support Next.js and Serverless.</MdxComponents.p>
+          <MdxComponents.p>
+            Check out the <MdxComponents.a href="/code-examples">example code</MdxComponents.a> to see how easy it is to
+            use FaydaPass for authentication.
+          </MdxComponents.p>
+        </section>
 
-        <MdxComponents.h2 id="flexible-and-easy-to-use">
-          Flexible and easy to use
-        </MdxComponents.h2>
-        <MdxComponents.ul>
-          <MdxComponents.li>
-            Designed to work with any OAuth service, it supports OAuth 1.0, 1.0A,
-            2.0 and OpenID Connect
-          </MdxComponents.li>
-          <MdxComponents.li>
-            Built-in support for many popular sign-in services
-          </MdxComponents.li>
-          <MdxComponents.li>
-            Supports email / passwordless authentication
-          </MdxComponents.li>
-          <MdxComponents.li>
-            Supports stateless authentication with any backend (Active Directory,
-            LDAP, etc)
-          </MdxComponents.li>
-        </MdxComponents.ul>
+        <section id="flexible-and-easy-to-use">
+          <MdxComponents.h2>Flexible and easy to use</MdxComponents.h2>
+          <MdxComponents.ul>
+            <MdxComponents.li>
+              Designed to work with any <MdxComponents.a href="#">OAuth service</MdxComponents.a>, it supports{" "}
+              <MdxComponents.a href="#">OAuth 1.0</MdxComponents.a>, <MdxComponents.a href="#">1.0A</MdxComponents.a>,{" "}
+              <MdxComponents.a href="#">2.0</MdxComponents.a> and{" "}
+              <MdxComponents.a href="#">OpenID Connect</MdxComponents.a>
+            </MdxComponents.li>
+            <MdxComponents.li>
+              Built-in support for <MdxComponents.a href="#">many popular sign-in services</MdxComponents.a>
+            </MdxComponents.li>
+            <MdxComponents.li>
+              Supports <MdxComponents.a href="#">email</MdxComponents.a> /{" "}
+              <MdxComponents.a href="#">passwordless authentication</MdxComponents.a>
+            </MdxComponents.li>
+            <MdxComponents.li>
+              Supports stateless authentication with <MdxComponents.a href="#">any backend</MdxComponents.a> (Active
+              Directory, LDAP, etc)
+            </MdxComponents.li>
+            <MdxComponents.li>Supports both JSON Web Tokens and database sessions</MdxComponents.li>
+            <MdxComponents.li>
+              Designed for Serverless but runs anywhere (AWS Lambda, Docker, Heroku, etc...)
+            </MdxComponents.li>
+          </MdxComponents.ul>
+        </section>
 
-        <MdxComponents.h2 id="own-your-own-data">
-          Own your own data
-        </MdxComponents.h2>
-        <MdxComponents.p>
-          FaydaPass can be used with or without a database.
-        </MdxComponents.p>
+        <section id="own-your-own-data">
+          <MdxComponents.h2>Own your own data</MdxComponents.h2>
+          <MdxComponents.p>FaydaPass can be used with or without a database.</MdxComponents.p>
+        </section>
 
-        <MdxComponents.h2 id="secure-by-default">
-          Secure by default
-        </MdxComponents.h2>
-        <MdxComponents.p>
-          Security is paramount. FaydaPass is built with robust security features, including:
-        </MdxComponents.p>
-        <MdxComponents.ul>
-          <MdxComponents.li>OAuth 2.0 with PKCE and state parameter validation.</MdxComponents.li>
-          <MdxComponents.li>Secure token storage (e.g., using `sessionStorage`).</MdxComponents.li>
-          <MdxComponents.li>CSRF (Cross-Site Request Forgery) protection.</MdxComponents.li>
-          <MdxComponents.li>Encrypted data transmission.</MdxComponents.li>
-          <MdxComponents.li>No sensitive data is persisted directly in the application.</MdxComponents.li>
-        </MdxComponents.ul>
+        <section id="secure-by-default">
+          <MdxComponents.h2>Secure by default</MdxComponents.h2>
+          <MdxComponents.p>
+            Security is paramount. FaydaPass is built with robust security features, including:
+          </MdxComponents.p>
+        </section>
 
-        <MdxComponents.h2 id="credits">Credits</MdxComponents.h2>
-        <MdxComponents.p>
-          FaydaPass is an open-source project. We extend our gratitude to the contributors:
-        </MdxComponents.p>
-        <MdxComponents.ul>
-          <MdxComponents.li>
-            <a href="#" target="_blank" rel="noopener noreferrer">Mohamed Ibrahim</a>
-          </MdxComponents.li>
-          <MdxComponents.li>
-            <a href="#" target="_blank" rel="noopener noreferrer">Fetiya Yusuf</a>
-          </MdxComponents.li>
-        </MdxComponents.ul>
+        <section id="credits">
+          <MdxComponents.h2>Credits</MdxComponents.h2>
+          <MdxComponents.p>
+            FaydaPass is an open-source project. We extend our gratitude to the contributors.
+          </MdxComponents.p>
+        </section>
 
-        <MdxComponents.h2 id="getting-started-next-steps">
-          Getting Started
-        </MdxComponents.h2>
-        <MdxComponents.p>
-          Ready to integrate FaydaPass into your application? Visit our{" "}
-          <a href="/resources">Developer Resources</a> page for quick start guides, API references, and more.
-        </MdxComponents.p>
+        <section id="getting-started-next-steps">
+          <MdxComponents.h2>Getting Started</MdxComponents.h2>
+          <MdxComponents.p>
+            Ready to integrate FaydaPass into your application? Visit our{" "}
+            <MdxComponents.a href="/resources">Developer Resources</MdxComponents.a> page for quick start guides, API
+            references, and more.
+          </MdxComponents.p>
+        </section>
       </DocsLayout>
-      <Footer /> {/* Footer outside DocsLayout to span full width */}
+      <Footer />
     </DocsBackgroundWrapper>
-  );
+  )
 }

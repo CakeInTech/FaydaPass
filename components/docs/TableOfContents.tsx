@@ -14,10 +14,8 @@ export function TableOfContents() {
   const [activeId, setActiveId] = useState<string | null>(null)
 
   useEffect(() => {
-    const headings = Array.from(
-      document.querySelectorAll("main h2, main h3")
-    ).map((el) => ({
-      level: parseInt(el.tagName.substring(1), 10),
+    const headings = Array.from(document.querySelectorAll("main h2, main h3")).map((el) => ({
+      level: Number.parseInt(el.tagName.substring(1), 10),
       text: el.textContent || "",
       id: el.id,
     }))
@@ -33,7 +31,7 @@ export function TableOfContents() {
           }
         })
       },
-      { rootMargin: `0% 0% -80% 0%` }
+      { rootMargin: `0% 0% -80% 0%` },
     )
 
     toc.forEach(({ id }) => {
@@ -54,19 +52,17 @@ export function TableOfContents() {
   }
 
   return (
-    <div className="space-y-2">
-      <p className="font-medium">On This Page</p>
+    <div className="space-y-4">
+      <p className="font-semibold text-white text-sm">On This Page</p>
       <ul className="space-y-2">
         {toc.map(({ id, level, text }) => (
           <li key={id}>
             <a
               href={`#${id}`}
               className={cn(
-                "inline-block text-sm no-underline transition-colors hover:text-primary",
-                id === activeId
-                  ? "font-medium text-primary"
-                  : "text-muted-foreground",
-                level === 3 && "pl-4"
+                "inline-block text-sm no-underline transition-colors hover:text-primary-400",
+                id === activeId ? "font-medium text-primary-400" : "text-gray-400",
+                level === 3 && "pl-4",
               )}
             >
               {text}
