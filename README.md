@@ -191,11 +191,9 @@ npm run build
 
 - GitHub: [Fetiya Yusuf](https://github.com/fafiyusuf)
 
-## 📄 License
+👤 **Keyreh Husen**
 
-👤 **Fetiya Yusuf**
-
-- GitHub: [Keyreh Ibrahim](https://github.com/keyreh)
+- GitHub: [Keyreh Husen](https://github.com/keyreh)
 
 ## 📄 License
 
