@@ -184,7 +184,6 @@ Traditional KYC processes in Ethiopia are:
 
 - 🔄 **Marketplace**: Third-party integrations and plugins
 - 🔄 **Advanced Analytics**: Machine learning-powered insights and fraud detection
-- 🔄 **International Expansion**: Support for other African countries
 - 🔄 **Developer Portal**: Self-service developer tools and documentation
 - 🔄 **Enterprise SSO**: Single sign-on for enterprise customers
 
