@@ -31,9 +31,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Search, Plus, Edit, Trash2 } from "lucide-react";
+import { Search, Plus, Edit, Trash2, User } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { AdminUser } from "@/lib/supabase";
+import Link from "next/link";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -50,6 +51,12 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
+
+      if (!supabase) {
+        console.warn("Supabase client not initialized");
+        return;
+      }
+
       // Note: This will only return the current user due to RLS policies
       const { data, error } = await supabase
         .from("admin_users")
@@ -105,6 +112,11 @@ export default function UsersPage() {
 
   const handleAddUser = async () => {
     try {
+      if (!supabase) {
+        console.warn("Supabase client not initialized");
+        return;
+      }
+
       const { error } = await supabase.from("admin_users").insert([newUser]);
 
       if (error) {
@@ -273,6 +285,11 @@ export default function UsersPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
+                            <Link href={`/admin/users/${user.id}`}>
+                              <Button variant="ghost" size="sm">
+                                <User className="h-4 w-4" />
+                              </Button>
+                            </Link>
                             <Button variant="ghost" size="sm">
                               <Edit className="h-4 w-4" />
                             </Button>

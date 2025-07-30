@@ -40,6 +40,12 @@ export default function VerificationsPage() {
   const fetchVerifications = async () => {
     try {
       setLoading(true);
+
+      if (!supabase) {
+        console.warn("Supabase client not initialized");
+        return;
+      }
+
       const { data, error } = await supabase
         .from("verifications")
         .select("*")
