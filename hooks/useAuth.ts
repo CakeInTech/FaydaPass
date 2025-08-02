@@ -38,10 +38,12 @@ export function useAuth() {
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log("Auth state changed:", event, session?.user?.email);
         setUser(session?.user ?? null);
 
         if (session?.user?.email) {
           const admin = await checkAdminUser(session.user.email);
+          console.log("Admin check result:", admin);
           setAdminUser(admin);
         } else {
           setAdminUser(null);
@@ -58,11 +60,35 @@ export function useAuth() {
     if (!supabase) {
       return { error: new Error("Supabase not configured") };
     }
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        return { error };
+      }
+
+      // Check if user is an admin after successful login
+      if (data.user?.email) {
+        const admin = await checkAdminUser(data.user.email);
+        if (!admin) {
+          // User is not an admin, sign them out
+          await supabase.auth.signOut();
+          return {
+            error: new Error(
+              "Access denied. You are not authorized to access the admin dashboard."
+            ),
+          };
+        }
+      }
+
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
   };
 
   const signOut = async () => {

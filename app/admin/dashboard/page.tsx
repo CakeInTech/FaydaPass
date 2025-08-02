@@ -45,6 +45,15 @@ export default function AdminDashboardPage() {
         return;
       }
 
+      // Check if user is authenticated
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        console.error("No active session");
+        return;
+      }
+
       // Fetch all verifications
       const { data: verifications, error } = await supabase
         .from("verifications")

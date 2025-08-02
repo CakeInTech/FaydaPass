@@ -7,10 +7,11 @@ export async function middleware(req: NextRequest) {
 
   // Check if the request is for an admin route
   const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
+  const isLoginRoute = req.nextUrl.pathname === "/admin/login";
 
-  if (isAdminRoute) {
-    // For now, we'll let the client-side handle authentication
-    // The middleware will be enhanced once we have proper server-side auth
+  if (isAdminRoute && !isLoginRoute) {
+    // For admin routes (except login), we'll let the client-side handle authentication
+    // The AdminLayout component will redirect to login if not authenticated
     return res;
   }
 

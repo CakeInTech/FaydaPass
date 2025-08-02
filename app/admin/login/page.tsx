@@ -22,12 +22,24 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { signIn, user, adminUser } = useAuth();
+  const { signIn, user, adminUser, loading: authLoading } = useAuth();
   const router = useRouter();
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Redirect if already authenticated
   if (user && adminUser) {
-    router.push("/admin/dashboard");
+    router.replace("/admin/dashboard");
     return null;
   }
 
@@ -36,20 +48,23 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError("");
 
+    console.log("Attempting login with:", email);
     const { error } = await signIn(email, password);
 
     if (error) {
+      console.error("Login error:", error);
       setError(error.message);
       toast.error("Login failed", {
         description: error.message,
       });
       setLoading(false);
     } else {
+      console.log("Login successful, redirecting...");
       toast.success("Login successful", {
         description: "Welcome to the admin dashboard!",
       });
       // Auth hook will handle redirect
-      router.push("/admin/dashboard");
+      router.replace("/admin/dashboard");
     }
   };
 
