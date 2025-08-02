@@ -8,40 +8,55 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  Zap,
+  Shield,
   Activity,
   TrendingUp,
   BarChart3,
   Settings,
   LogOut,
-  Eye,
-  EyeOff,
 } from "lucide-react";
 import BackgroundWrapper from "@/components/BackgroundWrapper";
 import {
-  getAllVerifications,
-  Verification,
+  getCompanyById,
+  getCompanyVerifications,
   Company,
+  Verification,
   signOut,
 } from "@/lib/supabase";
+import { faydapass } from "@/lib/faydapass-sdk";
 
-export default function AdminDashboard() {
+export default function CompanyDashboard() {
   const router = useRouter();
+  const [company, setCompany] = useState<Company | null>(null);
   const [verifications, setVerifications] = useState<Verification[]>([]);
-  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     total: 0,
     successful: 0,
     failed: 0,
     pending: 0,
-    companies: 0,
   });
 
   useEffect(() => {
     const loadDashboard = async () => {
+      const companyId = sessionStorage.getItem("company_id");
+      const userEmail = sessionStorage.getItem("user_email");
+
+      if (!companyId || !userEmail) {
+        router.push("/company-signup");
+        return;
+      }
+
       try {
-        // Load all verifications
-        const verificationData = await getAllVerifications();
+        // Load company data
+        const companyData = await getCompanyById(companyId);
+        if (companyData) {
+          setCompany(companyData);
+        }
+
+        // Load verifications
+        const verificationData = await getCompanyVerifications(companyId);
         setVerifications(verificationData);
 
         // Calculate stats
@@ -56,17 +71,7 @@ export default function AdminDashboard() {
           (v) => v.status === "pending" || v.status === "processing"
         ).length;
 
-        // Get unique companies
-        const uniqueCompanies = Array.from(
-          new Set(
-            verificationData
-              .map((v) => v.company_id)
-              .filter((id): id is string => id !== null && id !== undefined)
-          )
-        );
-        const companies = uniqueCompanies.length;
-
-        setStats({ total, successful, failed, pending, companies });
+        setStats({ total, successful, failed, pending });
       } catch (error) {
         console.error("Error loading dashboard:", error);
       } finally {
@@ -75,7 +80,7 @@ export default function AdminDashboard() {
     };
 
     loadDashboard();
-  }, []);
+  }, [router]);
 
   const handleLogout = async () => {
     try {
@@ -131,7 +136,7 @@ export default function AdminDashboard() {
     return (
       <BackgroundWrapper>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-white text-xl">Loading admin dashboard...</div>
+          <div className="text-white text-xl">Loading dashboard...</div>
         </div>
       </BackgroundWrapper>
     );
@@ -145,21 +150,21 @@ export default function AdminDashboard() {
           <div className="max-w-7xl mx-auto px-6 py-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
                   <Building2 className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-white">
-                    FaydaPass Admin Dashboard
+                    {company?.name || "Company Dashboard"}
                   </h1>
                   <p className="text-white/60 text-sm">
-                    System Overview & Analytics
+                    {sessionStorage.getItem("user_email")}
                   </p>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
                 <button
-                  onClick={() => router.push("/admin/settings")}
+                  onClick={() => router.push("/company-settings")}
                   className="text-white/70 hover:text-white transition-colors"
                 >
                   <Settings className="w-5 h-5" />
@@ -177,7 +182,7 @@ export default function AdminDashboard() {
 
         <div className="max-w-7xl mx-auto px-6 py-8">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             {[
               {
                 title: "Total Verifications",
@@ -203,12 +208,6 @@ export default function AdminDashboard() {
                 icon: <Clock className="w-6 h-6 text-yellow-400" />,
                 color: "text-yellow-400",
               },
-              {
-                title: "Active Companies",
-                value: stats.companies,
-                icon: <Building2 className="w-6 h-6 text-purple-400" />,
-                color: "text-purple-400",
-              },
             ].map((stat, index) => (
               <div
                 key={index}
@@ -231,8 +230,59 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {/* Recent Verifications */}
+          {/* API Key Section */}
           <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-white">
+                API Configuration
+              </h2>
+              <div className="flex items-center space-x-2">
+                <Shield className="w-5 h-5 text-green-400" />
+                <span className="text-green-400 text-sm font-medium">
+                  Active
+                </span>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-white/70 text-sm mb-2">
+                  API Key
+                </label>
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="text"
+                    value={
+                      sessionStorage.getItem("api_key") || "fp_live_demo_key"
+                    }
+                    readOnly
+                    className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white font-mono text-sm"
+                  />
+                  <button className="bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-lg transition-colors">
+                    Copy
+                  </button>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <p className="text-white/60 text-sm">Base URL</p>
+                  <p className="text-white font-mono text-sm">
+                    https://api.faydapass.com
+                  </p>
+                </div>
+                <div>
+                  <p className="text-white/60 text-sm">Status</p>
+                  <p className="text-green-400 text-sm">Active</p>
+                </div>
+                <div>
+                  <p className="text-white/60 text-sm">Plan</p>
+                  <p className="text-white text-sm">Professional</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Verifications */}
+          <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-white">
                 Recent Verifications
@@ -242,7 +292,7 @@ export default function AdminDashboard() {
               </button>
             </div>
             <div className="space-y-4">
-              {verifications.slice(0, 10).map((verification) => (
+              {verifications.slice(0, 5).map((verification) => (
                 <div
                   key={verification.id}
                   className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10"
@@ -254,27 +304,21 @@ export default function AdminDashboard() {
                         {verification.user_email}
                       </p>
                       <p className="text-white/60 text-sm">
-                        Company ID: {verification.company_id?.substring(0, 8)}
-                        ...
+                        {verification.fayda_id || "No Fayda ID"}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <div className="text-right">
-                      <span
-                        className={`text-sm font-medium ${getStatusColor(
-                          verification.status
-                        )}`}
-                      >
-                        {verification.status}
-                      </span>
-                      <p className="text-white/60 text-sm">
-                        {new Date(verification.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <button className="text-white/60 hover:text-white transition-colors">
-                      <Eye className="w-4 h-4" />
-                    </button>
+                    <span
+                      className={`text-sm font-medium ${getStatusColor(
+                        verification.status
+                      )}`}
+                    >
+                      {verification.status}
+                    </span>
+                    <span className="text-white/60 text-sm">
+                      {new Date(verification.created_at).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -283,77 +327,10 @@ export default function AdminDashboard() {
                   <Users className="w-12 h-12 text-white/40 mx-auto mb-4" />
                   <p className="text-white/60">No verifications yet</p>
                   <p className="text-white/40 text-sm">
-                    Verification data will appear here as companies integrate
-                    FaydaPass
+                    Start integrating FaydaPass to see verification data here
                   </p>
                 </div>
               )}
-            </div>
-          </div>
-
-          {/* System Status */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-white">System Status</h3>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-green-400 text-sm font-medium">
-                    All Systems Operational
-                  </span>
-                </div>
-              </div>
-              <div className="space-y-3">
-                {[
-                  {
-                    service: "API Gateway",
-                    status: "Operational",
-                    color: "text-green-400",
-                  },
-                  {
-                    service: "Fayda Integration",
-                    status: "Operational",
-                    color: "text-green-400",
-                  },
-                  {
-                    service: "Database",
-                    status: "Operational",
-                    color: "text-green-400",
-                  },
-                  {
-                    service: "Webhook Service",
-                    status: "Operational",
-                    color: "text-green-400",
-                  },
-                ].map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between"
-                  >
-                    <span className="text-white">{item.service}</span>
-                    <span className={`text-sm font-medium ${item.color}`}>
-                      {item.status}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-white">Quick Actions</h3>
-              </div>
-              <div className="space-y-3">
-                <button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-3 rounded-lg font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-300">
-                  View All Companies
-                </button>
-                <button className="w-full bg-gradient-to-r from-green-500 to-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:from-green-600 hover:to-blue-700 transition-all duration-300">
-                  Generate Reports
-                </button>
-                <button className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white px-4 py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-red-700 transition-all duration-300">
-                  System Settings
-                </button>
-              </div>
             </div>
           </div>
         </div>

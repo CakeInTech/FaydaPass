@@ -235,7 +235,9 @@ export default function VerificationsPage() {
                         <TableCell>
                           {getStatusBadge(verification.status)}
                         </TableCell>
-                        <TableCell>{getTypeBadge(verification.type)}</TableCell>
+                        <TableCell>
+                          {getTypeBadge(verification.type || "unknown")}
+                        </TableCell>
                         <TableCell>
                           <div className="text-sm">
                             <div>Match: {verification.match_score}%</div>
