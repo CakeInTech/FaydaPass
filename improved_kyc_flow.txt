@@ -1,0 +1,305 @@
+IMPROVED FAYDAPASS KYC MVP FLOW
+================================
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              CURRENT ISSUES                                   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   No Data   │    │   Admin     │    │   Missing   │
+    │   Storage   │    │   Dashboard │    │   Verification│
+    │             │    │             │    │   Tracking  │
+    │ • sessionStorage│ │ • Mock Data │    │             │
+    │ • Lost Data │    │ • No Real   │    │ • No Status │
+    │ • No Persist│    │   Stats     │    │ • No Scores │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              IMPROVED KYC FLOW                                │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 1: VERIFICATION INITIATION (ENHANCED)                                  │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐
+    │   /verify   │
+    │             │
+    │ • PKCE Gen  │
+    │ • State Gen │
+    │ • OAuth URL │
+    │ • Consent   │
+    │ • Create    │
+    │   Verification│
+    │   Record    │
+    └─────────────┘
+           │
+           ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Supabase  │    │   sessionStorage│  │   Fayda     │
+    │   Insert    │    │             │    │   OAuth     │
+    │             │    │             │    │             │
+    │ • verification_id│ │ • code_verifier│  │ • Auth      │
+    │ • user_email│    │ • oauth_state│   │ • Endpoint  │
+    │ • status: pending│ │ • verification_id│ │ • Redirect  │
+    │ • created_at│    └─────────────┘    └─────────────┘
+    └─────────────┘
+           │
+           ▼
+    ┌─────────────┐
+    │   Redirect  │
+    │   to Fayda  │
+    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 2: OAUTH CALLBACK WITH DATA CAPTURE                                    │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   /callback │    │   State     │    │   Code      │
+    │             │    │   Validation│    │   Exchange  │
+    │ • Validate  │    │             │    │             │
+    │ • Exchange  │    │ • oauth_state│   │ • /api/token│
+    │ • Store     │    │ • Security  │    │ • JWT Assert│
+    │ • Update    │    └─────────────┘    └─────────────┘
+    │   Record    │
+    └─────────────┘
+           │
+           ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │ sessionStorage│   │   Supabase  │    │   Token     │
+    │             │   │   Update     │    │   Response  │
+    │ • access_token│   │             │    │             │
+    │ • user_info │   │ • status: processing│ • access_token│
+    │ • verification_id│ │ • token_received│ • expires_in│
+    └─────────────┘    └─────────────┘    └─────────────┘
+           │                   │                   │
+           ▼                   ▼                   ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   User Info │    │   Verification│   │   Success   │
+    │   Fetch     │    │   Update     │    │   Path      │
+    │             │    │             │    │             │
+    │ • /api/userinfo│ │ • user_data  │    │ • /verified │
+    │ • Bearer Token│ │ • fayda_id   │    │ • Display   │
+    │ • Profile   │   │ • status: success│ │ • Download  │
+    └─────────────┘    └─────────────┘    └─────────────┘
+           │                   │                   │
+           ▼                   ▼                   ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   User Data │    │   Final     │    │   Verification│
+    │   Processing│    │   Update    │    │   Complete  │
+    │             │    │             │    │             │
+    │ • Parse     │    │ • match_score│   │ • Success   │
+    │ • Validate  │    │ • liveness_score│ │ • Complete  │
+    │ • Store     │    │ • completed_at│  │ • Redirect  │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 3: VERIFICATION SUCCESS WITH DATA STORAGE                              │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   /verified │    │   Supabase  │    │   User      │
+    │             │    │   Final     │    │   Session   │
+    │ • Display   │    │   Update    │    │   Storage   │
+    │ • Download  │    │             │    │             │
+    │ • Share     │    │ • status: success│ │ • user_info │
+    │ • Redirect  │    │ • scores    │    │ • verification_id│
+    └─────────────┘    │ • completed_at│  │ • access_token│
+           │           └─────────────┘    └─────────────┘
+           │                   │                   │
+           ▼                   ▼                   ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   /dashboard│    │   Admin     │    │   Real-time │
+    │             │    │   Dashboard │    │   Updates   │
+    │ • Welcome   │    │             │    │             │
+    │ • API Key   │    │ • Real Data │    │ • Live Stats│
+    │ • Actions   │    │ • Real Stats│    │ • Notifications│
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 4: ADMIN DASHBOARD WITH REAL DATA                                      │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   /admin    │    │   Supabase  │    │   Real-time │
+    │   Dashboard │    │   Queries   │    │   Monitoring│
+    │             │    │             │    │             │
+    │ • Real Stats│    │ • SELECT *  │    │ • Webhooks  │
+    │ • Real Data │    │ • WHERE     │    │ • SSE       │
+    │ • Real Time │    │ • ORDER BY  │    │ • Polling   │
+    └─────────────┘    └─────────────┘    └─────────────┘
+           │                   │                   │
+           ▼                   ▼                   ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Verification│   │   User      │    │   Analytics │
+    │   Details    │    │   Management│    │   & Reports │
+    │             │    │             │    │             │
+    │ • Status    │    │ • Profiles  │    │ • Success Rate│
+    │ • Scores    │    │ • History   │    │ • Avg Scores│
+    │ • Timeline  │    │ • Actions   │    │ • Trends    │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              DATA FLOW IMPROVEMENTS                           │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  DATABASE SCHEMA ENHANCEMENTS                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   verifications│   │   users     │    │   verification_logs│
+    │   table      │    │   table     │    │   table     │
+    │             │    │             │    │             │
+    │ • id (UUID) │    │ • id (UUID) │    │ • id (UUID) │
+    │ • user_email│    │ • email     │    │ • verification_id│
+    │ • status    │    │ • name      │    │ • event     │
+    │ • fayda_id  │    │ • fayda_id  │    │ • timestamp │
+    │ • match_score│   │ • created_at│    │ • details   │
+    │ • liveness_score│ │ • updated_at│    │ • metadata  │
+    │ • user_data │    │ • status    │    └─────────────┘
+    │ • created_at│    └─────────────┘
+    │ • updated_at│
+    │ • completed_at│
+    └─────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  API ENHANCEMENTS                                                            │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │ /api/verification│ │ /api/verification│ │ /api/verification│
+    │ /create      │    │ /update     │    │ /status     │
+    │             │    │             │    │             │
+    │ • POST      │    │ • PUT       │    │ • GET       │
+    │ • Create    │    │ • Update    │    │ • Status    │
+    │ • Record    │    │ • Status    │    │ • Progress  │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  REAL-TIME UPDATES                                                            │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Supabase  │    │   WebSocket │    │   Admin     │
+    │   Realtime  │    │   Connection│    │   Dashboard │
+    │             │    │             │    │             │
+    │ • Changes   │    │ • Live      │    │ • Auto      │
+    │ • Triggers  │    │ • Updates   │    │ • Refresh   │
+    │ • Subscriptions│ │ • Events    │    │ • Notifications│
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              IMPLEMENTATION STEPS                             │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 1: DATABASE MIGRATION                                                  │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Create    │    │   Update    │    │   Add       │
+    │   Verification│   │   Existing  │    │   Indexes   │
+    │   Table     │    │   Schema    │    │             │
+    │             │    │             │    │             │
+    │ • UUID PK   │    │ • Add       │    │ • user_email│
+    │ • Status    │    │   Columns   │    │ • status    │
+    │ • Scores    │    │ • Modify    │    │ • created_at│
+    │ • Timestamps│    │   Types     │    │ • fayda_id  │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 2: API ENDPOINTS                                                       │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │ /api/verification│ │ /api/verification│ │ /api/verification│
+    │ /create      │    │ /[id]/update│    │ /[id]/status│
+    │             │    │             │    │             │
+    │ • Create    │    │ • Update    │    │ • Get       │
+    │ • Record    │    │ • Status    │    │ • Status    │
+    │ • Return ID │    │ • Scores    │    │ • Progress  │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 3: FRONTEND INTEGRATION                                                │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   /verify   │    │   /callback │    │   /verified │
+    │   Update    │    │   Update    │    │   Update    │
+    │             │    │             │    │             │
+    │ • Create    │    │ • Update    │    │ • Display   │
+    │ • Record    │    │ • Status    │    │ • Real Data │
+    │ • Store ID  │    │ • Store     │    │ • Download  │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 4: ADMIN DASHBOARD                                                     │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Real Data │    │   Real-time │    │   Analytics │
+    │   Queries   │    │   Updates   │    │   Charts    │
+    │             │    │             │    │             │
+    │ • Supabase  │    │ • WebSocket │    │ • Success   │
+    │ • SELECT    │    │ • SSE       │    │   Rate      │
+    │ • WHERE     │    │ • Polling   │    │ • Avg Scores│
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              CORRECTED USER FLOW                              │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+USER JOURNEY (IMPROVED):
+User → Landing → Verify → Create Record → Fayda OAuth → Callback →
+Token Exchange → Update Record → UserInfo Fetch → Update Record →
+Verified → Dashboard → Admin Monitoring
+
+ADMIN JOURNEY (IMPROVED):
+Admin → Login → Dashboard → Real Data → Live Updates → Analytics
+
+DATA FLOW (IMPROVED):
+Create Record → OAuth → Token → UserInfo → Store Data →
+Admin Dashboard → Real-time Monitoring
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              KEY IMPROVEMENTS                                │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Data      │    │   Real-time │    │   Admin     │
+    │   Persistence│   │   Updates   │    │   Insights  │
+    │             │    │             │    │             │
+    │ • Supabase  │    │ • WebSocket │    │ • Real Stats│
+    │ • Database  │    │ • SSE       │    │ • Real Data │
+    │ • Permanent │    │ • Live      │    │ • Analytics │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Verification│   │   Status    │    │   Tracking  │
+    │   Tracking  │    │   Updates   │    │   Complete  │
+    │             │    │             │    │             │
+    │ • Record    │    │ • Pending   │    │ • Timeline  │
+    │ • Progress  │    │ • Processing│    │ • Scores    │
+    │ • Status    │    │ • Success   │    │ • Results   │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              END IMPROVED FLOW                               │
+└─────────────────────────────────────────────────────────────────────────────────┘

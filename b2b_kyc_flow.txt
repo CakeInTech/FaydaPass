@@ -1,0 +1,301 @@
+FAYDAPASS B2B KYC SERVICE FLOW
+==============================
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              BUSINESS MODEL CORRECTION                          │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Current   │    │   Correct   │    │   Target    │
+    │   Model     │    │   Model     │    │   Market    │
+    │             │    │             │    │             │
+    │ • Consumer  │    │ • B2B       │    │ • Banks     │
+    │ • Direct    │    │ • API       │    │ • Fintechs  │
+    │ • User Flow │    │ • Service   │    │ • Government│
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              CORRECTED B2B FLOW                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 1: LANDING PAGE WITH CALL TO ACTION                                       │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐
+    │   Landing   │
+    │   Page (/)  │
+    │             │
+    │ • Hero      │
+    │ • Features  │
+    │ • Pricing   │
+    │ • CTA       │
+    └─────────────┘
+           │
+           ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Company   │    │   Developer │    │   Learn     │
+    │   Sign Up   │    │   Sign Up   │    │   More      │
+    │             │    │             │    │             │
+    │ • Business  │    │ • Technical │    │ • Docs      │
+    │ • Full KYC  │    │ • API Only  │    │ • Pricing   │
+    │ • Dashboard │    │ • SDK       │    │ • Support   │
+    └─────────────┘    └─────────────┘    └─────────────┘
+           │                   │                   │
+           ▼                   ▼                   ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Company   │    │   Developer │    │   Resources │
+    │   Onboarding│    │   Onboarding│    │             │
+    │             │    │             │    │ • API Docs  │
+    │ • Business  │    │ • API Keys  │    │ • SDK Docs  │
+    │ • Compliance│    │ • SDK       │    │ • Examples  │
+    │ • Integration│   │ • Quick Start│   │ • Support   │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 2: COMPANY ONBOARDING FLOW                                                │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐
+    │   Company   │
+    │   Sign Up   │
+    │             │
+    │ • Business  │
+    │ • Contact   │
+    │ • Industry  │
+    │ • Use Case  │
+    └─────────────┘
+           │
+           ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Business  │    │   Compliance │    │   Technical │
+    │   Details   │    │   Check      │    │   Setup     │
+    │             │    │             │    │             │
+    │ • Company   │    │ • KYC       │    │ • API Keys  │
+    │ • Industry  │    │ • AML       │    │ • Webhooks  │
+    │ • Volume    │    │ • Regulatory│    │ • Integration│
+    └─────────────┘    └─────────────┘    └─────────────┘
+           │                   │                   │
+           ▼                   ▼                   ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Approval  │    │   Dashboard │    │   Integration│
+    │   Process   │    │   Access    │    │   Guide     │
+    │             │    │             │    │             │
+    │ • Review    │    │ • Admin     │    │ • API Docs  │
+    │ • Approval  │    │ • Users     │    │ • SDK       │
+    │ • Contract  │    │ • Analytics │    │ • Support   │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 3: DEVELOPER ONBOARDING FLOW                                              │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐
+    │   Developer │
+    │   Sign Up   │
+    │             │
+    │ • Email     │
+    │ • Name      │
+    │ • Use Case  │
+    │ • Project   │
+    └─────────────┘
+           │
+           ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   API Key   │    │   SDK       │    │   Quick     │
+    │   Generation│    │   Download  │    │   Start     │
+    │             │    │             │    │             │
+    │ • Generate  │    │ • Node.js   │    │ • Tutorial  │
+    │ • Sandbox   │    │ • Python    │    │ • Examples  │
+    │ • Production│    │ • Java      │    │ • Testing   │
+    └─────────────┘    └─────────────┘    └─────────────┘
+           │                   │                   │
+           ▼                   ▼                   ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   API Docs  │    │   Testing   │    │   Support   │
+    │   Access    │    │   Environment│   │   Resources │
+    │             │    │             │    │             │
+    │ • REST API  │    │ • Sandbox   │    │ • Community │
+    │ • Webhooks  │    │ • Test Data │    │ • Discord   │
+    │ • Examples  │    │ • Mock      │    │ • Email     │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 4: COMPANY DASHBOARD (ADMIN)                                              │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Company   │    │   KYC       │    │   Analytics │
+    │   Dashboard │    │   Management│    │   & Reports │
+    │             │    │             │    │             │
+    │ • Overview  │    │ • Verifications│  │ • Success Rate│
+    │ • Users     │    │ • Status    │    │ • Volume    │
+    │ • Settings  │    │ • Results   │    │ • Trends    │
+    └─────────────┘    └─────────────┘    └─────────────┘
+           │                   │                   │
+           ▼                   ▼                   ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   User      │    │   Verification│   │   Compliance│
+    │   Management│    │   Details    │    │   Reports   │
+    │             │    │             │    │             │
+    │ • Add Users │    │ • Status    │    │ • KYC       │
+    │ • Permissions│   │ • Scores    │    │ • AML       │
+    │ • Activity  │    │ • Timeline  │    │ • Regulatory│
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 5: KYC INTEGRATION FLOW                                                   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Company   │    │   API       │    │   Fayda     │
+    │   App       │    │   Call      │    │   eSignet   │
+    │             │    │             │    │             │
+    │ • User      │    │ • POST      │    │ • OAuth     │
+    │ • KYC       │    │ • /kyc/initiate│ │ • Verification│
+    │ • Request   │    │ • User Data │    │ • Response  │
+    └─────────────┘    └─────────────┘    └─────────────┘
+           │                   │                   │
+           ▼                   ▼                   ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   FaydaPass │    │   Webhook   │    │   Company   │
+    │   API       │    │   Response  │    │   Database  │
+    │             │    │             │    │             │
+    │ • Process   │    │ • Status    │    │ • Store     │
+    │ • Validate  │    │ • Results   │    │ • Update    │
+    │ • Return    │    │ • Scores    │    │ • Notify    │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 6: API FLOW FOR COMPANIES                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Company   │    │   FaydaPass │    │   Fayda     │
+    │   API Call  │    │   API       │    │   eSignet   │
+    │             │    │             │    │             │
+    │ • POST      │    │ • Validate  │    │ • OAuth     │
+    │ • /kyc/initiate│ │ • Process   │    │ • Verify    │
+    │ • User Data │    │ • Proxy     │    │ • Return    │
+    └─────────────┘    └─────────────┘    └─────────────┘
+           │                   │                   │
+           ▼                   ▼                   ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Response  │    │   Webhook   │    │   Company   │
+    │   to Company│    │   to Company│    │   Database  │
+    │             │    │             │    │             │
+    │ • Status    │    │ • Results   │    │ • Store     │
+    │ • ID        │    │ • Scores    │    │ • Update    │
+    │ • Next Steps│    │ • Data      │    │ • Notify    │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  STEP 7: ADMIN DASHBOARD FOR FAYDAPASS                                          │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Company   │    │   Analytics │    │   Support   │
+    │   Management│    │   & Reports │    │   & Billing │
+    │             │    │             │    │             │
+    │ • Companies │    │ • Usage     │    │ • Tickets   │
+    │ • Users     │    │ • Revenue   │    │ • Billing   │
+    │ • Activity  │    │ • Trends    │    │ • Support   │
+    └─────────────┘    └─────────────┘    └─────────────┘
+           │                   │                   │
+           ▼                   ▼                   ▼
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   Company   │    │   Financial │    │   Customer  │
+    │   Details   │    │   Reports   │    │   Success   │
+    │             │    │             │    │             │
+    │ • Profile   │    │ • Revenue   │    │ • Onboarding│
+    │ • Usage     │    │ • Billing   │    │ • Support   │
+    │ • Settings  │    │ • Analytics │    │ • Retention │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              CORRECTED USER JOURNEYS                            │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+COMPANY JOURNEY:
+Landing → Company Sign Up → Business Details → Compliance Check →
+Approval → Dashboard Access → API Integration → KYC Service Usage
+
+DEVELOPER JOURNEY:
+Landing → Developer Sign Up → API Key Generation → SDK Download →
+API Docs → Testing → Integration → Production
+
+END-USER JOURNEY (via Company App):
+Company App → KYC Request → FaydaPass API → Fayda eSignet →
+Verification → Results → Company Database
+
+FAYDAPASS ADMIN JOURNEY:
+Admin Login → Company Management → Analytics → Support → Billing
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              KEY DIFFERENCES                                    │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   OLD MODEL │    │   NEW MODEL │    │   BENEFITS  │
+    │             │    │             │    │             │
+    │ • Consumer  │    │ • B2B       │    │ • Scalable  │
+    │ • Direct    │    │ • API       │    │ • Revenue   │
+    │ • User Flow │    │ • Service   │    │ • Enterprise│
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+    │   No User   │    │   Company   │    │   Developer │
+    │   Management│    │   Dashboard │    │   Resources │
+    │             │    │             │    │             │
+    │ • Individual│    │ • Multi-user│    │ • API Docs  │
+    │ • Direct    │    │ • Admin     │    │ • SDK       │
+    │ • Limited   │    │ • Analytics │    │ • Support   │
+    └─────────────┘    └─────────────┘    └─────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              IMPLEMENTATION PRIORITIES                          │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+PHASE 1: LANDING & ONBOARDING
+• Landing page with clear CTAs
+• Company sign-up flow
+• Developer sign-up flow
+• Basic company dashboard
+
+PHASE 2: API & INTEGRATION
+• KYC API endpoints
+• Webhook system
+• SDK development
+• Documentation
+
+PHASE 3: ADMIN & ANALYTICS
+• FaydaPass admin dashboard
+• Company management
+• Analytics and reporting
+• Billing system
+
+PHASE 4: ENTERPRISE FEATURES
+• Advanced compliance
+• Multi-tenant architecture
+• Enterprise support
+• Advanced analytics
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              END B2B FLOW                                       │
+└─────────────────────────────────────────────────────────────────────────────────┘
