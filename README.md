@@ -375,14 +375,17 @@ Our implementation follows the full OAuth 2.0 + OIDC specification:
 
 - GitHub: [@CakeInTech](https://github.com/CakeInTech)
 - LinkedIn: [Mohamed Ibrahim](https://www.linkedin.com/in/cakeintech/)
+- Email: cake.intech@gmail.com
 
 👤 **Fetiya Yusuf** - Developer
 
 - GitHub: [@fafiyusuf](https://github.com/fafiyusuf)
+- Email: fafiyusuf123456@gmail.com
 
 👤 **Keyreh Husen** - Developer
 
 - GitHub: [@keyreh](https://github.com/keyreh)
+- Email: Keeyreh@gmail.com
 
 ## 📄 **License**
 
