@@ -1,23 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import {
-  CheckCircle,
-  Download,
-  Share2,
-  Shield,
-  User,
-  Phone,
-  Mail,
-  Calendar,
-  Home,
-  ArrowRight,
-} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import {
+  ArrowRight,
+  Calendar,
+  CheckCircle,
+  Download,
+  Mail,
+  Phone,
+  Share2,
+  Shield,
+  User
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface UserInfo {
   sub: string;
@@ -33,6 +32,59 @@ interface UserInfo {
   name_am?: string;
   verified_at?: string;
 }
+
+const ProgressStepper = ({ currentStep }: { currentStep: number }) => {
+  const steps = [
+    "Select Method",
+    "Fayda Authentication",
+    "Verification Complete",
+  ];
+
+  return (
+    <div className="w-full max-w-2xl mx-auto my-8">
+      <div className="flex items-center">
+        {steps.map((step, index) => {
+          const stepNumber = index + 1;
+          const isCompleted = stepNumber <= currentStep;
+
+          return (
+            <div key={step} className="flex items-center w-full">
+              <div className="flex flex-col items-center">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${
+                    isCompleted
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-300 text-gray-600"
+                  }`}
+                >
+                  {isCompleted ? (
+                    <CheckCircle className="w-6 h-6" />
+                  ) : (
+                    stepNumber
+                  )}
+                </div>
+                <p
+                  className={`mt-2 text-sm text-center font-medium ${
+                    isCompleted ? "text-gray-900" : "text-gray-500"
+                  }`}
+                >
+                  {step}
+                </p>
+              </div>
+              {index < steps.length - 1 && (
+                <div
+                  className={`flex-grow h-1 -mx-2 ${
+                    isCompleted ? "bg-green-600" : "bg-gray-300"
+                  }`}
+                ></div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export default function VerifiedPage() {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
@@ -144,6 +196,7 @@ export default function VerifiedPage() {
       </nav>
 
       <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <ProgressStepper currentStep={3} />
         <div className="text-center mb-12">
           <div className="inline-block mb-6">
             <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-2xl">
