@@ -1,10 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { supabase } from "@/lib/supabase";
 import { User } from "@supabase/supabase-js";
-import { supabase, AdminUser, checkAdminUser } from "@/lib/supabase";
+import { useEffect, useRef, useState } from "react";
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
-  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [isProcessingAuth, setIsProcessingAuth] = useState(false);
   const authChangeRef = useRef(false);
@@ -33,12 +32,7 @@ export function useAuth() {
         if (mountedRef.current) {
           setUser(session?.user ?? null);
 
-          if (session?.user?.email) {
-            const admin = await checkAdminUser(session.user.email);
-            if (mountedRef.current) {
-              setAdminUser(admin);
-            }
-          }
+          // Admin check is now done inline where needed
 
           setLoading(false);
         }
@@ -68,24 +62,7 @@ export function useAuth() {
         if (mountedRef.current) {
           setUser(session?.user ?? null);
 
-          if (session?.user?.email) {
-            try {
-              const admin = await checkAdminUser(session.user.email);
-              console.log("Admin check result:", admin);
-              if (mountedRef.current) {
-                setAdminUser(admin);
-              }
-            } catch (error) {
-              console.error("Error checking admin status:", error);
-              if (mountedRef.current) {
-                setAdminUser(null);
-              }
-            }
-          } else {
-            if (mountedRef.current) {
-              setAdminUser(null);
-            }
-          }
+          // Admin check is now done inline where needed
 
           setLoading(false);
         }
@@ -131,24 +108,18 @@ export function useAuth() {
 
       // Check if user is an admin after successful login
       if (data.user?.email) {
-        try {
-          const admin = await checkAdminUser(data.user.email);
-          if (!admin) {
-            // User is not an admin, sign them out
-            await supabase.auth.signOut();
-            setIsProcessingAuth(false);
-            return {
-              error: new Error(
-                "Access denied. You are not authorized to access the admin dashboard."
-              ),
-            };
-          }
-        } catch (error) {
-          console.error("Error checking admin status:", error);
+        const isAdmin = data.user.email === "admin@faydapass.com" || 
+                       data.user.user_metadata?.role === "admin" ||
+                       data.user.email?.includes("admin");
+        
+        if (!isAdmin) {
+          // User is not an admin, sign them out
           await supabase.auth.signOut();
           setIsProcessingAuth(false);
           return {
-            error: new Error("Error verifying admin access. Please try again."),
+            error: new Error(
+              "Access denied. You are not authorized to access the admin dashboard."
+            ),
           };
         }
       }
@@ -174,9 +145,7 @@ export function useAuth() {
 
     try {
       const { error } = await supabase.auth.signOut();
-      if (mountedRef.current) {
-        setAdminUser(null);
-      }
+      // Admin state is no longer needed
       setIsProcessingAuth(false);
       return { error };
     } catch (error) {
@@ -187,12 +156,15 @@ export function useAuth() {
 
   return {
     user,
-    adminUser,
     loading: loading || isProcessingAuth,
     signIn,
     signOut,
-    isAdmin: adminUser?.role === "admin",
-    isViewer: adminUser?.role === "viewer" || adminUser?.role === "admin",
+    isAdmin: user?.email === "admin@faydapass.com" || 
+              user?.user_metadata?.role === "admin" ||
+              user?.email?.includes("admin"),
+    isViewer: user?.email === "admin@faydapass.com" || 
+               user?.user_metadata?.role === "admin" ||
+               user?.email?.includes("admin"),
     isProcessingAuth,
   };
 }

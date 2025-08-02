@@ -1,34 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Building2,
-  Users,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Activity,
-  TrendingUp,
-  BarChart3,
-  Settings,
-  LogOut,
-  Eye,
-  EyeOff,
-} from "lucide-react";
 import BackgroundWrapper from "@/components/BackgroundWrapper";
 import {
-  getAllVerifications,
-  Verification,
   Company,
+  getAllVerifications,
+  getCurrentUser,
   signOut,
+  Verification
 } from "@/lib/supabase";
+import {
+  Activity,
+  Building2,
+  CheckCircle,
+  Clock,
+  Eye,
+  LogOut,
+  Settings,
+  Users,
+  XCircle
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function AdminDashboard() {
   const router = useRouter();
   const [verifications, setVerifications] = useState<Verification[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authStatus, setAuthStatus] = useState<string>("Checking authentication...");
   const [stats, setStats] = useState({
     total: 0,
     successful: 0,
@@ -38,44 +37,79 @@ export default function AdminDashboard() {
   });
 
   useEffect(() => {
-    const loadDashboard = async () => {
+    const checkAuthentication = async () => {
       try {
-        // Load all verifications
-        const verificationData = await getAllVerifications();
-        setVerifications(verificationData);
+        // Check if user is authenticated
+        const currentUser = await getCurrentUser();
+        if (!currentUser) {
+          setAuthStatus("No authenticated user found");
+          router.push("/admin/login");
+          return;
+        }
 
-        // Calculate stats
-        const total = verificationData.length;
-        const successful = verificationData.filter(
-          (v) => v.status === "success"
-        ).length;
-        const failed = verificationData.filter(
-          (v) => v.status === "failed"
-        ).length;
-        const pending = verificationData.filter(
-          (v) => v.status === "pending" || v.status === "processing"
-        ).length;
+        setAuthStatus(`User authenticated: ${currentUser.email}`);
 
-        // Get unique companies
-        const uniqueCompanies = Array.from(
-          new Set(
-            verificationData
-              .map((v) => v.company_id)
-              .filter((id): id is string => id !== null && id !== undefined)
-          )
-        );
-        const companies = uniqueCompanies.length;
+        // Check if user is admin using simplified approach
+        const isAdmin = currentUser.email === "admin@faydapass.com" || 
+                       currentUser.user_metadata?.role === "admin" ||
+                       currentUser.email?.includes("admin");
+        
+        if (!isAdmin) {
+          setAuthStatus("User is not an admin");
+          console.error("User is not an admin:", currentUser.email);
+          router.push("/");
+          return;
+        }
 
-        setStats({ total, successful, failed, pending, companies });
+        setAuthStatus(`Admin access confirmed for: ${currentUser.email}`);
+
+        // Load dashboard data
+        const loadDashboard = async () => {
+          try {
+            // Load all verifications
+            const verificationData = await getAllVerifications();
+            setVerifications(verificationData);
+
+            // Calculate stats
+            const total = verificationData.length;
+            const successful = verificationData.filter(
+              (v) => v.status === "success"
+            ).length;
+            const failed = verificationData.filter(
+              (v) => v.status === "failed"
+            ).length;
+            const pending = verificationData.filter(
+              (v) => v.status === "pending" || v.status === "processing"
+            ).length;
+
+            // Get unique companies
+            const uniqueCompanies = Array.from(
+              new Set(
+                verificationData
+                  .map((v) => v.company_id)
+                  .filter((id): id is string => id !== null && id !== undefined)
+              )
+            );
+            const companies = uniqueCompanies.length;
+
+            setStats({ total, successful, failed, pending, companies });
+          } catch (error) {
+            console.error("Error loading dashboard:", error);
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        loadDashboard();
       } catch (error) {
-        console.error("Error loading dashboard:", error);
-      } finally {
-        setLoading(false);
+        console.error("Authentication check error:", error);
+        setAuthStatus("Authentication error occurred");
+        router.push("/admin/login");
       }
     };
 
-    loadDashboard();
-  }, []);
+    checkAuthentication();
+  }, [router]);
 
   const handleLogout = async () => {
     try {
@@ -131,7 +165,10 @@ export default function AdminDashboard() {
     return (
       <BackgroundWrapper>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-white text-xl">Loading admin dashboard...</div>
+          <div className="text-center">
+            <div className="text-white text-xl mb-4">Loading admin dashboard...</div>
+            <div className="text-white/60 text-sm">{authStatus}</div>
+          </div>
         </div>
       </BackgroundWrapper>
     );
