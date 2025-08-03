@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -20,11 +21,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Filter, Download } from "lucide-react";
-import { supabase } from "@/lib/supabase";
-import { Verification } from "@/lib/supabase";
+import { supabase, Verification } from "@/lib/supabase";
+import { Download, Filter, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function VerificationsPage() {
   const [verifications, setVerifications] = useState<Verification[]>([]);
@@ -35,6 +34,30 @@ export default function VerificationsPage() {
 
   useEffect(() => {
     fetchVerifications();
+
+    if (!supabase) {
+      console.warn("Supabase client not initialized, cannot subscribe.");
+      return;
+    }
+
+    const channel = supabase
+      .channel("realtime-verifications")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "verifications" },
+        (payload) => {
+          console.log("New verification received:", payload.new);
+          setVerifications((currentVerifications) => [
+            payload.new as Verification,
+            ...currentVerifications,
+          ]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchVerifications = async () => {

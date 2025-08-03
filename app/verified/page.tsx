@@ -1,23 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import {
-  CheckCircle,
-  Download,
-  Share2,
-  Shield,
-  User,
-  Phone,
-  Mail,
-  Calendar,
-  Home,
-  ArrowRight,
-} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import {
+  Calendar,
+  CheckCircle,
+  Download,
+  Mail,
+  Phone,
+  Share2,
+  Shield,
+  User
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface UserInfo {
   sub: string;
@@ -287,12 +285,12 @@ export default function VerifiedPage() {
                 Share Verification
               </Button>
             )}
-            <Link href="/dashboard" className="w-full">
+            {/* <Link href="/dashboard" className="w-full">
               <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700">
                 <ArrowRight className="w-4 h-4 mr-2" />
                 Continue to Dashboard
               </Button>
-            </Link>
+            </Link> */}
           </Card>
         </div>
       </div>
