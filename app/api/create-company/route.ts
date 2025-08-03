@@ -3,10 +3,13 @@ import { createClient } from "@supabase/supabase-js";
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json();
+    const companyData = await request.json();
 
-    if (!email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    if (!companyData.name || !companyData.contact_email) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -21,22 +24,24 @@ export async function POST(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get user from users table using service role
-    const { data: user, error } = await supabase
-      .from("users")
-      .select("user_type, name, email, api_key")
-      .eq("email", email)
+    // Create company record in database
+    const { data, error } = await supabase
+      .from("companies")
+      .insert([companyData])
+      .select()
       .single();
 
     if (error) {
-      console.error("Error fetching user:", error);
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      console.error("Error creating company:", error);
+      return NextResponse.json(
+        { error: "Failed to create company record" },
+        { status: 500 }
+      );
     }
 
-    console.log("User found:", user);
-    return NextResponse.json({ data: user });
+    return NextResponse.json({ data });
   } catch (error) {
-    console.error("Error in check-user-type:", error);
+    console.error("Error in create-company:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

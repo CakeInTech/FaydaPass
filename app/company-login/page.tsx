@@ -45,16 +45,25 @@ export default function CompanyLoginPage() {
 
       if (data?.user) {
         // Check if user is a company user
-        const { data: userRecord } = await fetch("/api/check-user-type", {
+        const userRecord = await fetch("/api/check-user-type", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: data.user.email }),
         }).then((res) => res.json());
 
-        if (userRecord?.user_type === "company_user") {
+        console.log("Company login - User type check response:", userRecord);
+
+        if (userRecord?.data?.user_type === "company_user") {
           toast.success("Login successful", {
             description: "Welcome back to your company dashboard!",
           });
+
+          // Store user data in session storage for dashboard
+          sessionStorage.setItem("user_email", data.user.email || "");
+          sessionStorage.setItem("user_name", userRecord.data.name);
+          sessionStorage.setItem("user_type", "company_user");
+          sessionStorage.setItem("api_key", userRecord.data.api_key || "");
+
           router.push("/company-dashboard");
         } else {
           // User exists but is not a company user

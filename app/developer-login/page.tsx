@@ -30,8 +30,12 @@ export default function DeveloperLoginPage() {
     setLoading(true);
     setError("");
 
+    console.log("Starting developer login for:", email);
+
     try {
       const { data, error } = await signInWithEmail(email, password);
+
+      console.log("SignIn result:", { data, error });
 
       if (error) {
         console.error("Login error:", error);
@@ -44,19 +48,36 @@ export default function DeveloperLoginPage() {
       }
 
       if (data?.user) {
+        console.log("User authenticated, checking user type...");
         // Check if user is a developer
-        const { data: userRecord } = await fetch("/api/check-user-type", {
+        const response = await fetch("/api/check-user-type", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: data.user.email }),
-        }).then((res) => res.json());
+        });
 
-        if (userRecord?.user_type === "developer") {
+        console.log("User type check response status:", response.status);
+
+        const userRecord = await response.json();
+        console.log("User type check result:", userRecord);
+
+        if (userRecord?.data?.user_type === "developer") {
+          console.log("User is developer, redirecting to dashboard");
+
+          // Store user data in session storage for dashboard
+          sessionStorage.setItem("user_email", data.user.email);
+          sessionStorage.setItem("user_name", userRecord.data.name);
+          sessionStorage.setItem("user_type", "developer");
+          sessionStorage.setItem("api_key", userRecord.data.api_key || "");
+
           toast.success("Login successful", {
             description: "Welcome back to your developer dashboard!",
           });
+          console.log("About to redirect to /developer-dashboard");
           router.push("/developer-dashboard");
+          console.log("Redirect called, waiting...");
         } else {
+          console.log("User is not a developer, signing out");
           // User exists but is not a developer
           await signOut();
           setError("This account is not registered as a developer");
@@ -64,6 +85,8 @@ export default function DeveloperLoginPage() {
             description: "This account is not registered as a developer",
           });
         }
+      } else {
+        console.log("No user data returned from signIn");
       }
     } catch (error) {
       console.error("Login error:", error);

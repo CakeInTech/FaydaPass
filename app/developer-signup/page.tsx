@@ -32,7 +32,7 @@ export default function DeveloperSignupPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<string[]>([]);
 
   const [formData, setFormData] = useState<DeveloperFormData>({
     name: "",
@@ -44,39 +44,42 @@ export default function DeveloperSignupPage() {
   });
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+    const errors: string[] = [];
 
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
+      errors.push("Name is required");
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
+      errors.push("Email is required");
+    } else {
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        errors.push("Please enter a valid email address");
+      }
     }
 
     if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password =
-        "Password must contain uppercase, lowercase, and number";
+      errors.push("Password is required");
+    } else if (formData.password.length < 6) {
+      errors.push("Password must be at least 6 characters");
     }
 
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
+    if (formData.password !== formData.confirmPassword) {
+      errors.push("Passwords do not match");
     }
 
-    if (!formData.use_case) {
-      newErrors.use_case = "Please select a use case";
+    if (!formData.use_case.trim()) {
+      errors.push("Use case is required");
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (!formData.project.trim()) {
+      errors.push("Project description is required");
+    }
+
+    setErrors(errors);
+    return errors.length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,6 +90,7 @@ export default function DeveloperSignupPage() {
     }
 
     setLoading(true);
+    console.log("Starting developer signup for:", formData.email);
 
     try {
       // Create developer user with proper Supabase Auth
@@ -97,6 +101,8 @@ export default function DeveloperSignupPage() {
         formData.use_case
       );
 
+      console.log("createDeveloperUser result:", { user, error });
+
       if (error) {
         console.error("Signup error:", error);
         if (
@@ -104,16 +110,20 @@ export default function DeveloperSignupPage() {
           error.message.includes("already been registered") ||
           error.message.includes("already exists in database")
         ) {
-          alert(
-            "An account with this email already exists. Please sign in instead."
-          );
+          toast.error("Account already exists", {
+            description:
+              "An account with this email already exists. Please sign in instead.",
+          });
         } else {
-          alert("Failed to create developer account. Please try again.");
+          toast.error("Signup failed", {
+            description: error.message,
+          });
         }
         return;
       }
 
       if (user) {
+        console.log("User created successfully:", user);
         // Store user info in session for dashboard
         sessionStorage.setItem("user_id", user.id);
         sessionStorage.setItem("user_email", formData.email);
@@ -127,10 +137,17 @@ export default function DeveloperSignupPage() {
 
         // Redirect to login page instead of dashboard
         router.push("/developer-login");
+      } else {
+        console.error("No user returned from createDeveloperUser");
+        toast.error("Signup failed", {
+          description: "Failed to create account. Please try again.",
+        });
       }
     } catch (error) {
       console.error("Signup error:", error);
-      alert("Failed to create developer account. Please try again.");
+      toast.error("Signup failed", {
+        description: "Failed to create developer account. Please try again.",
+      });
     } finally {
       setLoading(false);
     }
@@ -175,13 +192,17 @@ export default function DeveloperSignupPage() {
                       setFormData({ ...formData, name: e.target.value })
                     }
                     className={`w-full bg-white/10 border rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                      errors.name ? "border-red-500" : "border-white/20"
+                      errors.includes("Name is required")
+                        ? "border-red-500"
+                        : "border-white/20"
                     }`}
                     placeholder="John Doe"
                     required
                   />
-                  {errors.name && (
-                    <p className="text-red-400 text-sm mt-1">{errors.name}</p>
+                  {errors.includes("Name is required") && (
+                    <p className="text-red-400 text-sm mt-1">
+                      Name is required
+                    </p>
                   )}
                 </div>
                 <div>
@@ -199,13 +220,23 @@ export default function DeveloperSignupPage() {
                       setFormData({ ...formData, email: e.target.value })
                     }
                     className={`w-full bg-white/10 border rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                      errors.email ? "border-red-500" : "border-white/20"
+                      errors.includes("Email is required") ||
+                      errors.includes("Please enter a valid email address")
+                        ? "border-red-500"
+                        : "border-white/20"
                     }`}
                     placeholder="john@company.com"
                     required
                   />
-                  {errors.email && (
-                    <p className="text-red-400 text-sm mt-1">{errors.email}</p>
+                  {errors.includes("Email is required") && (
+                    <p className="text-red-400 text-sm mt-1">
+                      Email is required
+                    </p>
+                  )}
+                  {errors.includes("Please enter a valid email address") && (
+                    <p className="text-red-400 text-sm mt-1">
+                      Please enter a valid email address
+                    </p>
                   )}
                 </div>
               </div>
@@ -227,7 +258,12 @@ export default function DeveloperSignupPage() {
                         setFormData({ ...formData, password: e.target.value })
                       }
                       className={`w-full bg-white/10 border rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-12 ${
-                        errors.password ? "border-red-500" : "border-white/20"
+                        errors.includes("Password is required") ||
+                        errors.includes(
+                          "Password must be at least 6 characters"
+                        )
+                          ? "border-red-500"
+                          : "border-white/20"
                       }`}
                       placeholder="••••••••"
                       required
@@ -244,9 +280,16 @@ export default function DeveloperSignupPage() {
                       )}
                     </button>
                   </div>
-                  {errors.password && (
+                  {errors.includes("Password is required") && (
                     <p className="text-red-400 text-sm mt-1">
-                      {errors.password}
+                      Password is required
+                    </p>
+                  )}
+                  {errors.includes(
+                    "Password must be at least 6 characters"
+                  ) && (
+                    <p className="text-red-400 text-sm mt-1">
+                      Password must be at least 6 characters
                     </p>
                   )}
                 </div>
@@ -269,7 +312,7 @@ export default function DeveloperSignupPage() {
                         })
                       }
                       className={`w-full bg-white/10 border rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-12 ${
-                        errors.confirmPassword
+                        errors.includes("Passwords do not match")
                           ? "border-red-500"
                           : "border-white/20"
                       }`}
@@ -290,9 +333,9 @@ export default function DeveloperSignupPage() {
                       )}
                     </button>
                   </div>
-                  {errors.confirmPassword && (
+                  {errors.includes("Passwords do not match") && (
                     <p className="text-red-400 text-sm mt-1">
-                      {errors.confirmPassword}
+                      Passwords do not match
                     </p>
                   )}
                 </div>
@@ -312,7 +355,9 @@ export default function DeveloperSignupPage() {
                     setFormData({ ...formData, use_case: e.target.value })
                   }
                   className={`w-full bg-white/10 border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    errors.use_case ? "border-red-500" : "border-white/20"
+                    errors.includes("Use case is required")
+                      ? "border-red-500"
+                      : "border-white/20"
                   }`}
                   required
                 >
@@ -323,8 +368,10 @@ export default function DeveloperSignupPage() {
                     </option>
                   ))}
                 </select>
-                {errors.use_case && (
-                  <p className="text-red-400 text-sm mt-1">{errors.use_case}</p>
+                {errors.includes("Use case is required") && (
+                  <p className="text-red-400 text-sm mt-1">
+                    Use case is required
+                  </p>
                 )}
               </div>
 
@@ -345,6 +392,11 @@ export default function DeveloperSignupPage() {
                   placeholder="Briefly describe your project..."
                   rows={3}
                 />
+                {errors.includes("Project description is required") && (
+                  <p className="text-red-400 text-sm mt-1">
+                    Project description is required
+                  </p>
+                )}
               </div>
 
               <button

@@ -108,10 +108,11 @@ export function useAuth() {
 
       // Check if user is an admin after successful login
       if (data.user?.email) {
-        const isAdmin = data.user.email === "admin@faydapass.com" || 
-                       data.user.user_metadata?.role === "admin" ||
-                       data.user.email?.includes("admin");
-        
+        const isAdmin =
+          data.user.email === "admin@faydapass.com" ||
+          data.user.user_metadata?.role === "admin" ||
+          data.user.email?.includes("admin");
+
         if (!isAdmin) {
           // User is not an admin, sign them out
           await supabase.auth.signOut();
@@ -159,12 +160,14 @@ export function useAuth() {
     loading: loading || isProcessingAuth,
     signIn,
     signOut,
-    isAdmin: user?.email === "admin@faydapass.com" || 
-              user?.user_metadata?.role === "admin" ||
-              user?.email?.includes("admin"),
-    isViewer: user?.email === "admin@faydapass.com" || 
-               user?.user_metadata?.role === "admin" ||
-               user?.email?.includes("admin"),
+    isAdmin:
+      user?.email === "admin@faydapass.com" ||
+      user?.user_metadata?.role === "admin" ||
+      user?.email?.includes("admin"),
+    isViewer:
+      user?.email === "admin@faydapass.com" ||
+      user?.user_metadata?.role === "admin" ||
+      user?.email?.includes("admin"),
     isProcessingAuth,
   };
 }

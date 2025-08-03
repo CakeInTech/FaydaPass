@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building, Eye, EyeOff } from "lucide-react";
+import { Building2, Eye, EyeOff } from "lucide-react";
 import BackgroundWrapper from "@/components/BackgroundWrapper";
 import { createCompany, createCompanyUser } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -26,12 +26,12 @@ const industries = [
   "Banking & Financial Services",
   "Fintech",
   "Government",
-  "NGO/Non-profit",
-  "E-commerce",
   "Healthcare",
-  "Education",
-  "Insurance",
+  "E-commerce",
   "Real Estate",
+  "Insurance",
+  "Education",
+  "NGO/Non-profit",
   "Other",
 ];
 
@@ -45,27 +45,27 @@ const employeeCounts = [
 
 const expectedVolumes = [
   "1-100 verifications/month",
-  "100-1,000 verifications/month",
-  "1,000-10,000 verifications/month",
-  "10,000+ verifications/month",
+  "100-500 verifications/month",
+  "500-1000 verifications/month",
+  "1000+ verifications/month",
 ];
 
 const complianceOptions = [
   "KYC/AML Compliance",
   "GDPR Compliance",
-  "PCI DSS Compliance",
   "SOC 2 Compliance",
-  "ISO 27001 Compliance",
-  "Local Regulatory Compliance",
+  "ISO 27001",
+  "PCI DSS",
+  "Other Regulatory Requirements",
 ];
 
 export default function CompanySignupPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<string[]>([]);
 
   const [formData, setFormData] = useState<CompanyFormData>({
     company_name: "",
@@ -83,47 +83,43 @@ export default function CompanySignupPage() {
   });
 
   const validateStep = (step: number) => {
-    const newErrors: Record<string, string> = {};
+    const errors: string[] = [];
 
     if (step === 1) {
       if (!formData.company_name.trim()) {
-        newErrors.company_name = "Company name is required";
+        errors.push("Company name is required");
       }
       if (!formData.contact_name.trim()) {
-        newErrors.contact_name = "Contact name is required";
+        errors.push("Contact name is required");
       }
       if (!formData.contact_email.trim()) {
-        newErrors.contact_email = "Email is required";
-      } else if (!/\S+@\S+\.\S+/.test(formData.contact_email)) {
-        newErrors.contact_email = "Please enter a valid email";
+        errors.push("Contact email is required");
+      } else {
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.contact_email)) {
+          errors.push("Please enter a valid email address");
+        }
       }
       if (!formData.password) {
-        newErrors.password = "Password is required";
-      } else if (formData.password.length < 8) {
-        newErrors.password = "Password must be at least 8 characters";
-      } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-        newErrors.password =
-          "Password must contain uppercase, lowercase, and number";
+        errors.push("Password is required");
+      } else if (formData.password.length < 6) {
+        errors.push("Password must be at least 6 characters");
       }
-      if (!formData.confirmPassword) {
-        newErrors.confirmPassword = "Please confirm your password";
-      } else if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = "Passwords do not match";
+      if (formData.password !== formData.confirmPassword) {
+        errors.push("Passwords do not match");
       }
     } else if (step === 2) {
       if (!formData.industry) {
-        newErrors.industry = "Please select an industry";
-      }
-      if (!formData.employee_count) {
-        newErrors.employee_count = "Please select employee count";
+        errors.push("Please select an industry");
       }
       if (!formData.expected_volume) {
-        newErrors.expected_volume = "Please select expected volume";
+        errors.push("Please select expected volume");
       }
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors(errors);
+    return errors.length === 0;
   };
 
   const handleNext = () => {
@@ -146,13 +142,13 @@ export default function CompanySignupPage() {
     setLoading(true);
 
     try {
-      // Create company first
+      // First create the company
       const company = await createCompany({
         name: formData.company_name,
-        industry: formData.industry,
         contact_email: formData.contact_email,
         contact_phone: formData.contact_phone,
         website: formData.website,
+        industry: formData.industry,
         employee_count: formData.employee_count,
         use_case: formData.use_case,
         expected_volume: formData.expected_volume,
@@ -160,53 +156,62 @@ export default function CompanySignupPage() {
         status: "pending",
       });
 
-      if (company) {
-        // Create company user with proper Supabase Auth
-        const { user, error } = await createCompanyUser(
-          formData.contact_email,
-          formData.password,
-          formData.contact_name,
-          company.id,
-          formData.company_name
-        );
+      if (!company) {
+        toast.error("Failed to create company", {
+          description: "Please try again.",
+        });
+        return;
+      }
 
-        if (error) {
-          console.error("Signup error:", error);
-          if (
-            error.message.includes("already registered") ||
-            error.message.includes("already been registered") ||
-            error.message.includes("already exists in database")
-          ) {
-            alert(
-              "An account with this email already exists. Please sign in instead."
-            );
-          } else {
-            alert("Failed to create company account. Please try again.");
-          }
-          return;
-        }
+      // Then create the company user
+      const { user, error } = await createCompanyUser(
+        formData.contact_email,
+        formData.password,
+        formData.contact_name,
+        company.id,
+        formData.company_name
+      );
 
-        if (user) {
-          // Store user info in session for dashboard
-          sessionStorage.setItem("user_id", user.id);
-          sessionStorage.setItem("user_email", formData.contact_email);
-          sessionStorage.setItem("user_name", formData.contact_name);
-          sessionStorage.setItem("user_type", "company_user");
-          sessionStorage.setItem("company_id", company.id);
-          sessionStorage.setItem("company_name", formData.company_name);
-          sessionStorage.setItem("api_key", user.api_key || "");
-
-          toast.success("Company registered successfully!", {
-            description: "You can now log in with your credentials.",
+      if (error) {
+        console.error("Signup error:", error);
+        if (
+          error.message.includes("already registered") ||
+          error.message.includes("already been registered") ||
+          error.message.includes("already exists in database")
+        ) {
+          toast.error("Account already exists", {
+            description:
+              "An account with this email already exists. Please sign in instead.",
           });
-
-          // Redirect to login page instead of dashboard
-          router.push("/company-login");
+        } else {
+          toast.error("Signup failed", {
+            description: error.message,
+          });
         }
+        return;
+      }
+
+      if (user) {
+        // Store user info in session for dashboard
+        sessionStorage.setItem("user_id", user.id);
+        sessionStorage.setItem("user_email", formData.contact_email);
+        sessionStorage.setItem("user_name", formData.contact_name);
+        sessionStorage.setItem("user_type", "company_user");
+        sessionStorage.setItem("company_id", company.id);
+        sessionStorage.setItem("api_key", user.api_key || "");
+
+        toast.success("Company registered successfully!", {
+          description: "You can now log in with your credentials.",
+        });
+
+        // Redirect to login page instead of dashboard
+        router.push("/company-login");
       }
     } catch (error) {
       console.error("Signup error:", error);
-      alert("Failed to create company account. Please try again.");
+      toast.error("Signup failed", {
+        description: "Failed to create company account. Please try again.",
+      });
     } finally {
       setLoading(false);
     }
@@ -219,63 +224,49 @@ export default function CompanySignupPage() {
           {/* Header */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <Building className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl flex items-center justify-center">
+                <Building2 className="w-6 h-6 text-white" />
               </div>
             </div>
             <h1 className="text-4xl font-bold text-white mb-4">
               Company Registration
             </h1>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              Register your company to access FaydaPass KYC services for your
-              business needs.
+              Register your company to access FaydaPass KYC services and
+              integrate government-backed identity verification.
             </p>
           </div>
 
-          {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-2">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                    currentStep >= 1
-                      ? "bg-indigo-500 text-white"
-                      : "bg-white/20 text-white/50"
-                  }`}
-                >
-                  1
-                </div>
-                <span
-                  className={`text-sm ${
-                    currentStep >= 1 ? "text-white" : "text-white/50"
-                  }`}
-                >
-                  Company Information
-                </span>
+          {/* Progress Steps */}
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center space-x-4">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                  currentStep >= 1
+                    ? "bg-indigo-500 text-white"
+                    : "bg-white/20 text-white/60"
+                }`}
+              >
+                1
               </div>
-              <div className="flex-1 h-1 bg-white/20 mx-4"></div>
-              <div className="flex items-center space-x-2">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                    currentStep >= 2
-                      ? "bg-indigo-500 text-white"
-                      : "bg-white/20 text-white/50"
-                  }`}
-                >
-                  2
-                </div>
-                <span
-                  className={`text-sm ${
-                    currentStep >= 2 ? "text-white" : "text-white/50"
-                  }`}
-                >
-                  Business Details
-                </span>
+              <div
+                className={`w-16 h-1 ${
+                  currentStep >= 2 ? "bg-indigo-500" : "bg-white/20"
+                }`}
+              ></div>
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                  currentStep >= 2
+                    ? "bg-indigo-500 text-white"
+                    : "bg-white/20 text-white/60"
+                }`}
+              >
+                2
               </div>
             </div>
           </div>
 
-          {/* Form */}
+          {/* Registration Form */}
           <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               {currentStep === 1 && (
@@ -299,16 +290,18 @@ export default function CompanySignupPage() {
                           })
                         }
                         className={`w-full bg-white/10 border rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                          errors.company_name
+                          errors.includes("Company name is required")
                             ? "border-red-500"
                             : "border-white/20"
                         }`}
-                        placeholder="Your Company Ltd"
+                        placeholder="Your Company Ltd."
                         required
                       />
-                      {errors.company_name && (
+                      {errors.includes("Company name is required") && (
                         <p className="text-red-400 text-sm mt-1">
-                          {errors.company_name}
+                          {errors.find(
+                            (err) => err === "Company name is required"
+                          )}
                         </p>
                       )}
                     </div>
@@ -317,7 +310,7 @@ export default function CompanySignupPage() {
                         htmlFor="contact_name"
                         className="block text-white font-medium mb-2"
                       >
-                        Contact Person Name *
+                        Contact Name *
                       </label>
                       <input
                         id="contact_name"
@@ -330,16 +323,18 @@ export default function CompanySignupPage() {
                           })
                         }
                         className={`w-full bg-white/10 border rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                          errors.contact_name
+                          errors.includes("Contact name is required")
                             ? "border-red-500"
                             : "border-white/20"
                         }`}
                         placeholder="John Doe"
                         required
                       />
-                      {errors.contact_name && (
+                      {errors.includes("Contact name is required") && (
                         <p className="text-red-400 text-sm mt-1">
-                          {errors.contact_name}
+                          {errors.find(
+                            (err) => err === "Contact name is required"
+                          )}
                         </p>
                       )}
                     </div>
@@ -364,16 +359,29 @@ export default function CompanySignupPage() {
                           })
                         }
                         className={`w-full bg-white/10 border rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                          errors.contact_email
+                          errors.includes("Contact email is required") ||
+                          errors.includes("Please enter a valid email address")
                             ? "border-red-500"
                             : "border-white/20"
                         }`}
-                        placeholder="john@company.com"
+                        placeholder="contact@company.com"
                         required
                       />
-                      {errors.contact_email && (
+                      {errors.includes("Contact email is required") && (
                         <p className="text-red-400 text-sm mt-1">
-                          {errors.contact_email}
+                          {errors.find(
+                            (err) => err === "Contact email is required"
+                          )}
+                        </p>
+                      )}
+                      {errors.includes(
+                        "Please enter a valid email address"
+                      ) && (
+                        <p className="text-red-400 text-sm mt-1">
+                          {errors.find(
+                            (err) =>
+                              err === "Please enter a valid email address"
+                          )}
                         </p>
                       )}
                     </div>
@@ -395,7 +403,7 @@ export default function CompanySignupPage() {
                           })
                         }
                         className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="+251 911 123 456"
+                        placeholder="+1234567890"
                       />
                     </div>
                   </div>
@@ -420,7 +428,10 @@ export default function CompanySignupPage() {
                             })
                           }
                           className={`w-full bg-white/10 border rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-12 ${
-                            errors.password
+                            errors.includes("Password is required") ||
+                            errors.includes(
+                              "Password must be at least 6 characters"
+                            )
                               ? "border-red-500"
                               : "border-white/20"
                           }`}
@@ -439,9 +450,19 @@ export default function CompanySignupPage() {
                           )}
                         </button>
                       </div>
-                      {errors.password && (
+                      {errors.includes("Password is required") && (
                         <p className="text-red-400 text-sm mt-1">
-                          {errors.password}
+                          {errors.find((err) => err === "Password is required")}
+                        </p>
+                      )}
+                      {errors.includes(
+                        "Password must be at least 6 characters"
+                      ) && (
+                        <p className="text-red-400 text-sm mt-1">
+                          {errors.find(
+                            (err) =>
+                              err === "Password must be at least 6 characters"
+                          )}
                         </p>
                       )}
                     </div>
@@ -464,7 +485,7 @@ export default function CompanySignupPage() {
                             })
                           }
                           className={`w-full bg-white/10 border rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-12 ${
-                            errors.confirmPassword
+                            errors.includes("Passwords do not match")
                               ? "border-red-500"
                               : "border-white/20"
                           }`}
@@ -485,9 +506,11 @@ export default function CompanySignupPage() {
                           )}
                         </button>
                       </div>
-                      {errors.confirmPassword && (
+                      {errors.includes("Passwords do not match") && (
                         <p className="text-red-400 text-sm mt-1">
-                          {errors.confirmPassword}
+                          {errors.find(
+                            (err) => err === "Passwords do not match"
+                          )}
                         </p>
                       )}
                     </div>
@@ -498,7 +521,7 @@ export default function CompanySignupPage() {
                       htmlFor="website"
                       className="block text-white font-medium mb-2"
                     >
-                      Company Website
+                      Website
                     </label>
                     <input
                       id="website"
@@ -531,20 +554,24 @@ export default function CompanySignupPage() {
                           setFormData({ ...formData, industry: e.target.value })
                         }
                         className={`w-full bg-white/10 border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                          errors.industry ? "border-red-500" : "border-white/20"
+                          errors.includes("Please select an industry")
+                            ? "border-red-500"
+                            : "border-white/20"
                         }`}
                         required
                       >
-                        <option value="">Select Industry</option>
+                        <option value="">Select your industry</option>
                         {industries.map((industry) => (
                           <option key={industry} value={industry}>
                             {industry}
                           </option>
                         ))}
                       </select>
-                      {errors.industry && (
+                      {errors.includes("Please select an industry") && (
                         <p className="text-red-400 text-sm mt-1">
-                          {errors.industry}
+                          {errors.find(
+                            (err) => err === "Please select an industry"
+                          )}
                         </p>
                       )}
                     </div>
@@ -553,7 +580,7 @@ export default function CompanySignupPage() {
                         htmlFor="employee_count"
                         className="block text-white font-medium mb-2"
                       >
-                        Employee Count *
+                        Employee Count
                       </label>
                       <select
                         id="employee_count"
@@ -564,45 +591,16 @@ export default function CompanySignupPage() {
                             employee_count: e.target.value,
                           })
                         }
-                        className={`w-full bg-white/10 border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                          errors.employee_count
-                            ? "border-red-500"
-                            : "border-white/20"
-                        }`}
-                        required
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       >
-                        <option value="">Select Employee Count</option>
+                        <option value="">Select employee count</option>
                         {employeeCounts.map((count) => (
                           <option key={count} value={count}>
                             {count}
                           </option>
                         ))}
                       </select>
-                      {errors.employee_count && (
-                        <p className="text-red-400 text-sm mt-1">
-                          {errors.employee_count}
-                        </p>
-                      )}
                     </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="use_case"
-                      className="block text-white font-medium mb-2"
-                    >
-                      Use Case
-                    </label>
-                    <textarea
-                      id="use_case"
-                      value={formData.use_case}
-                      onChange={(e) =>
-                        setFormData({ ...formData, use_case: e.target.value })
-                      }
-                      className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      placeholder="Describe how you plan to use FaydaPass KYC services..."
-                      rows={3}
-                    />
                   </div>
 
                   <div>
@@ -622,24 +620,45 @@ export default function CompanySignupPage() {
                         })
                       }
                       className={`w-full bg-white/10 border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                        errors.expected_volume
+                        errors.includes("Please select expected volume")
                           ? "border-red-500"
                           : "border-white/20"
                       }`}
                       required
                     >
-                      <option value="">Select Expected Volume</option>
+                      <option value="">Select expected volume</option>
                       {expectedVolumes.map((volume) => (
                         <option key={volume} value={volume}>
                           {volume}
                         </option>
                       ))}
                     </select>
-                    {errors.expected_volume && (
+                    {errors.includes("Please select expected volume") && (
                       <p className="text-red-400 text-sm mt-1">
-                        {errors.expected_volume}
+                        {errors.find(
+                          (err) => err === "Please select expected volume"
+                        )}
                       </p>
                     )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="use_case"
+                      className="block text-white font-medium mb-2"
+                    >
+                      Use Case
+                    </label>
+                    <textarea
+                      id="use_case"
+                      value={formData.use_case}
+                      onChange={(e) =>
+                        setFormData({ ...formData, use_case: e.target.value })
+                      }
+                      className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="Describe how you plan to use FaydaPass..."
+                      rows={3}
+                    />
                   </div>
 
                   <div>
@@ -650,7 +669,7 @@ export default function CompanySignupPage() {
                       {complianceOptions.map((option) => (
                         <label
                           key={option}
-                          className="flex items-center space-x-3"
+                          className="flex items-center space-x-2 text-white"
                         >
                           <input
                             type="checkbox"
@@ -676,11 +695,9 @@ export default function CompanySignupPage() {
                                 });
                               }
                             }}
-                            className="w-4 h-4 text-indigo-600 bg-white/10 border-white/20 rounded focus:ring-indigo-500"
+                            className="rounded border-white/20 bg-white/10 text-indigo-500 focus:ring-indigo-500"
                           />
-                          <span className="text-white/80 text-sm">
-                            {option}
-                          </span>
+                          <span className="text-sm">{option}</span>
                         </label>
                       ))}
                     </div>
@@ -694,7 +711,7 @@ export default function CompanySignupPage() {
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="px-6 py-3 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-colors"
+                    className="px-6 py-3 text-white border border-white/20 rounded-lg hover:bg-white/10 transition-colors"
                   >
                     Back
                   </button>
@@ -704,7 +721,7 @@ export default function CompanySignupPage() {
                   <button
                     type="button"
                     onClick={handleNext}
-                    className="px-8 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+                    className="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
                   >
                     Next
                   </button>
@@ -712,7 +729,7 @@ export default function CompanySignupPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-8 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-lg hover:from-green-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     {loading ? "Creating Account..." : "Create Company Account"}
                   </button>

@@ -15,7 +15,7 @@ import { Save, Globe, Shield, Bell, Database } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function SettingsPage() {
-  const { adminUser } = useAuth();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -256,11 +256,9 @@ export default function SettingsPage() {
               <div>
                 <Label>Current User</Label>
                 <div className="flex items-center gap-2 mt-2">
-                  <span className="text-sm font-medium">
-                    {adminUser?.email}
-                  </span>
+                  <span className="text-sm font-medium">{user?.email}</span>
                   <Badge variant="outline" className="text-xs">
-                    {adminUser?.role}
+                    {user?.role}
                   </Badge>
                 </div>
               </div>

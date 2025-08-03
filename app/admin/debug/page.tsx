@@ -18,41 +18,51 @@ export default function AdminDebugPage() {
         // Check environment variables
         info.envVars = {
           supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ? "Set" : "Missing",
-          supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "Set" : "Missing",
+          supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+            ? "Set"
+            : "Missing",
           serviceKey: process.env.SUPABASE_SERVICE_ROLE_KEY ? "Set" : "Missing",
         };
 
         // Check current user
         try {
           const user = await getCurrentUser();
-          info.currentUser = user ? {
-            id: user.id,
-            email: user.email,
-            emailVerified: user.email_confirmed_at ? "Yes" : "No",
-          } : "No user found";
+          info.currentUser = user
+            ? {
+                id: user.id,
+                email: user.email,
+                emailVerified: user.email_confirmed_at ? "Yes" : "No",
+              }
+            : "No user found";
         } catch (error) {
           info.currentUser = `Error: ${error}`;
         }
 
         // Check admin status using simplified approach
         if (info.currentUser && typeof info.currentUser !== "string") {
-          const isAdmin = info.currentUser.email === "admin@faydapass.com" || 
-                         info.currentUser.email?.includes("admin");
-          info.adminUser = isAdmin ? {
-            email: info.currentUser.email,
-            role: "admin",
-            method: "email-based check"
-          } : "Not an admin";
+          const isAdmin =
+            info.currentUser.email === "admin@faydapass.com" ||
+            info.currentUser.email?.includes("admin");
+          info.adminUser = isAdmin
+            ? {
+                email: info.currentUser.email,
+                role: "admin",
+                method: "email-based check",
+              }
+            : "Not an admin";
         } else {
           info.adminUser = "No user to check";
         }
 
         // Check cookies
         info.cookies = {
-          accessToken: document.cookie.includes("sb-access-token") ? "Present" : "Missing",
-          refreshToken: document.cookie.includes("sb-refresh-token") ? "Present" : "Missing",
+          accessToken: document.cookie.includes("sb-access-token")
+            ? "Present"
+            : "Missing",
+          refreshToken: document.cookie.includes("sb-refresh-token")
+            ? "Present"
+            : "Missing",
         };
-
       } catch (error) {
         info.error = error;
       }
@@ -79,7 +89,7 @@ export default function AdminDebugPage() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Admin Debug Information</h1>
-        
+
         <div className="grid gap-6">
           <Card>
             <CardHeader>
@@ -90,8 +100,10 @@ export default function AdminDebugPage() {
                 {Object.entries(debugInfo.envVars || {}).map(([key, value]) => (
                   <div key={key} className="flex justify-between">
                     <span className="font-mono text-sm">{key}:</span>
-                    <Badge variant={value === "Set" ? "default" : "destructive"}>
-                      {value}
+                    <Badge
+                      variant={value === "Set" ? "default" : "destructive"}
+                    >
+                      {String(value)}
                     </Badge>
                   </div>
                 ))}
@@ -111,7 +123,7 @@ export default function AdminDebugPage() {
                     {JSON.stringify(debugInfo.currentUser, null, 2)}
                   </pre>
                 </div>
-                
+
                 <div>
                   <h4 className="font-semibold mb-2">Admin Status:</h4>
                   <pre className="bg-gray-100 p-3 rounded text-sm overflow-auto">
@@ -131,8 +143,10 @@ export default function AdminDebugPage() {
                 {Object.entries(debugInfo.cookies || {}).map(([key, value]) => (
                   <div key={key} className="flex justify-between">
                     <span className="font-mono text-sm">{key}:</span>
-                    <Badge variant={value === "Present" ? "default" : "destructive"}>
-                      {value}
+                    <Badge
+                      variant={value === "Present" ? "default" : "destructive"}
+                    >
+                      {String(value)}
                     </Badge>
                   </div>
                 ))}
@@ -158,11 +172,14 @@ export default function AdminDebugPage() {
           <Button onClick={() => window.location.reload()}>
             Refresh Debug Info
           </Button>
-          <Button variant="outline" onClick={() => window.location.href = "/admin/login"}>
+          <Button
+            variant="outline"
+            onClick={() => (window.location.href = "/admin/login")}
+          >
             Go to Admin Login
           </Button>
         </div>
       </div>
     </div>
   );
-} 
+}

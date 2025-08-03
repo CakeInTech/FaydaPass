@@ -157,14 +157,23 @@ export async function checkAdminUser(email: string): Promise<AdminUser | null> {
 export async function getUserByEmail(email: string): Promise<User | null> {
   if (!supabase) return null;
 
-  const { data, error } = await supabase
-    .from("users")
-    .select("*")
-    .eq("email", email)
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
 
-  if (error || !data) return null;
-  return data;
+    if (error) {
+      console.error("Error fetching user by email:", error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Exception fetching user by email:", error);
+    return null;
+  }
 }
 
 // Get company by ID
@@ -247,20 +256,27 @@ export async function syncAuthUserWithDatabase(email: string) {
 export async function createUser(
   userData: Partial<User>
 ): Promise<User | null> {
-  if (!supabase) return null;
-
   try {
-    const { data, error } = await supabase
-      .from("users")
-      .insert([userData])
-      .select()
-      .single();
+    console.log("createUser called with:", userData);
 
-    if (error) {
-      console.error("Error creating user:", error);
+    const response = await fetch("/api/create-user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    });
+
+    console.log("createUser API response status:", response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error creating user:", errorData);
       return null;
     }
 
+    const { data } = await response.json();
+    console.log("createUser success:", data);
     return data;
   } catch (error) {
     console.error("Exception creating user:", error);
@@ -272,16 +288,27 @@ export async function createUser(
 export async function createCompany(
   companyData: Partial<Company>
 ): Promise<Company | null> {
-  if (!supabase) return null;
+  try {
+    const response = await fetch("/api/create-company", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(companyData),
+    });
 
-  const { data, error } = await supabase
-    .from("companies")
-    .insert([companyData])
-    .select()
-    .single();
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error creating company:", errorData);
+      return null;
+    }
 
-  if (error || !data) return null;
-  return data;
+    const { data } = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Exception creating company:", error);
+    return null;
+  }
 }
 
 // Clean up orphaned auth user if database creation fails
@@ -306,6 +333,25 @@ export async function createDeveloperUser(
   name: string,
   useCase: string
 ) {
+  console.log("createDeveloperUser called with:", { email, name, useCase });
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return {
+      user: null,
+      error: new Error("Please enter a valid email address"),
+    };
+  }
+
+  // Validate password
+  if (password.length < 6) {
+    return {
+      user: null,
+      error: new Error("Password must be at least 6 characters"),
+    };
+  }
+
   // First, check if user already exists in our database
   const existingUser = await getUserByEmail(email);
   if (existingUser) {
@@ -315,11 +361,14 @@ export async function createDeveloperUser(
     };
   }
 
+  console.log("Creating auth user...");
   // Create the auth user
   const { data: authData, error: authError } = await signUpWithEmail(
     email,
     password
   );
+
+  console.log("Auth signup result:", { authData, authError });
 
   if (authError) {
     console.error("Auth signup error:", authError);
@@ -333,24 +382,29 @@ export async function createDeveloperUser(
     };
   }
 
+  console.log("Auth user created, waiting...");
   // Wait a moment for the auth user to be fully created
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
+  console.log("Creating database user record...");
   // Then create the user record in our database
   const user = await createUser({
-    id: authData.user.id, // Use the auth user's ID
     email,
     name,
     user_type: "developer",
     api_key: `fp_dev_${name.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`,
   });
 
+  console.log("Database user creation result:", user);
+
   if (!user) {
+    console.error("Failed to create user record, cleaning up auth user");
     // Clean up the orphaned auth user
     await cleanupOrphanedAuthUser(email);
     return { user: null, error: new Error("Failed to create user record") };
   }
 
+  console.log("Developer user created successfully:", user);
   return { user, error: null };
 }
 
@@ -362,6 +416,23 @@ export async function createCompanyUser(
   companyId: string,
   companyName: string
 ) {
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return {
+      user: null,
+      error: new Error("Please enter a valid email address"),
+    };
+  }
+
+  // Validate password
+  if (password.length < 6) {
+    return {
+      user: null,
+      error: new Error("Password must be at least 6 characters"),
+    };
+  }
+
   // First, check if user already exists in our database
   const existingUser = await getUserByEmail(email);
   if (existingUser) {
@@ -394,7 +465,6 @@ export async function createCompanyUser(
 
   // Then create the user record in our database
   const user = await createUser({
-    id: authData.user.id, // Use the auth user's ID
     email,
     name,
     user_type: "company_user",
