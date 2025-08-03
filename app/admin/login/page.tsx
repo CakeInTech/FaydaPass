@@ -1,11 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -13,8 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Shield, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/useAuth";
+import { AlertCircle, Shield } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export default function AdminLoginPage() {
@@ -22,7 +22,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { signIn, user, adminUser, loading: authLoading } = useAuth();
+  const { signIn, user, loading: authLoading } = useAuth();
   const router = useRouter();
 
   // Show loading while checking authentication
@@ -38,7 +38,12 @@ export default function AdminLoginPage() {
   }
 
   // Redirect if already authenticated
-  if (user && adminUser) {
+  if (
+    user &&
+    (user.email === "admin@faydapass.com" ||
+      user.user_metadata?.role === "admin" ||
+      user.email?.includes("admin"))
+  ) {
     router.replace("/admin/dashboard");
     return null;
   }

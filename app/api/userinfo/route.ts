@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -113,13 +114,43 @@ export async function GET(request: NextRequest) {
 
         if (response.ok) {
           const responseText = await response.text();
-          console.log(`✅ SUCCESS with attempt ${i + 1}!`);
-          console.log("Response body:", responseText);
+          console.log("✅ SUCCESS with attempt 2!");
+          console.log("Response body:", responseText.substring(0, 200) + "...");
 
           try {
             // Try to parse as JSON first
             const jsonData = JSON.parse(responseText);
             console.log("✅ UserInfo parsed as JSON:", jsonData);
+
+            // Save to verifications table
+            if (supabase) {
+              try {
+                const verificationData: Partial<Verification> = {
+                  user_email: jsonData.email || "unknown",
+                  status: "success",
+                  fayda_id: jsonData.sub,
+                  api_provider: "OIDC Provider",
+                  user_data: jsonData,
+                };
+                const { error: insertError } = await supabase
+                  .from("verifications")
+                  .insert(verificationData);
+
+                if (insertError) {
+                  console.error(
+                    "Supabase insert error (JSON):",
+                    insertError.message
+                  );
+                } else {
+                  console.log("✅ Verification saved to database (JSON).");
+                }
+              } catch (dbError) {
+                console.error("Error saving to Supabase (JSON):", dbError);
+              }
+            } else {
+              console.warn("Supabase client not initialized. Skipping DB save.");
+            }
+
             return NextResponse.json(jsonData);
           } catch (jwtError) {
             console.log("Not JSON, trying as JWT...");
@@ -127,10 +158,7 @@ export async function GET(request: NextRequest) {
             // If not JSON, try to decode as JWT
             try {
               const parts = responseText.split(".");
-              if (parts.length !== 3) {
-                throw new Error("Invalid JWT format");
-              }
-
+              if (parts.length !== 3) throw new Error("Invalid JWT structure");
               const payload = JSON.parse(
                 Buffer.from(parts[1], "base64url").toString()
               );
@@ -138,9 +166,9 @@ export async function GET(request: NextRequest) {
 
               const processedUserInfo = {
                 sub: payload.sub,
-                name: payload.name || payload["name#en"] || payload["name#am"],
+                name: payload.name,
                 email: payload.email,
-                phone_number: payload.phone_number || payload.phone,
+                phone_number: payload.phone_number,
                 picture: payload.picture,
                 gender: payload.gender,
                 birthdate: payload.birthdate,
@@ -149,6 +177,37 @@ export async function GET(request: NextRequest) {
                 name_am: payload["name#am"],
                 fayda_id: payload.sub,
               };
+
+              // Save to verifications table
+              if (supabase) {
+                try {
+                  const verificationData: Partial<Verification> = {
+                    user_email: processedUserInfo.email || "unknown",
+                    status: "success",
+                    fayda_id: processedUserInfo.fayda_id,
+                    api_provider: "OIDC Provider",
+                    user_data: payload,
+                  };
+                  const { error: insertError } = await supabase
+                    .from("verifications")
+                    .insert(verificationData);
+
+                  if (insertError) {
+                    console.error(
+                      "Supabase insert error (JWT):",
+                      insertError.message
+                    );
+                  } else {
+                    console.log("✅ Verification saved to database (JWT).");
+                  }
+                } catch (dbError) {
+                  console.error("Error saving to Supabase (JWT):", dbError);
+                }
+              } else {
+                console.warn(
+                  "Supabase client not initialized. Skipping DB save."
+                );
+              }
 
               return NextResponse.json(processedUserInfo);
             } catch (decodeError) {

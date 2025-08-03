@@ -1,37 +1,35 @@
 "use client";
 
-import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { cn } from "@/lib/utils";
 import {
-  Shield,
-  LogOut,
-  Users,
-  Database,
-  Webhook,
-  BarChart3,
-  Settings,
-  UserCheck,
+    BarChart3,
+    LogOut,
+    Settings,
+    Shield,
+    UserCheck,
+    Users,
+    Webhook
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
 export function AdminLayout({ children }: AdminLayoutProps) {
-  const { user, adminUser, loading, signOut } = useAuth();
+  const { user, loading, signOut, isAdmin } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && (!user || !adminUser)) {
+    if (!loading && (!user || !isAdmin)) {
       router.replace("/admin/login");
     }
-  }, [user, adminUser, loading, router]);
+  }, [user, isAdmin, loading, router]);
 
   if (loading) {
     return (
@@ -44,7 +42,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     );
   }
 
-  if (!user || !adminUser) {
+  if (!user || !isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -71,7 +69,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       href: "/admin/users",
       icon: Users,
     },
-    ...(adminUser.role === "admin"
+    ...(isAdmin
       ? [
           {
             name: "Webhooks",
@@ -144,14 +142,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           {/* User info and sign out */}
           <div className="border-t border-gray-200 p-4">
             <div className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">
-                  {adminUser.email}
-                </span>
-                <span className="text-xs text-gray-500 capitalize">
-                  {adminUser.role}
-                </span>
-              </div>
+                          <div className="flex flex-col">
+              <span className="text-sm font-medium text-gray-900">
+                {user?.email}
+              </span>
+              <span className="text-xs text-gray-500 capitalize">
+                Admin
+              </span>
+            </div>
               <Button
                 variant="ghost"
                 size="sm"

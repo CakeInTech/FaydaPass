@@ -1,202 +1,94 @@
+import * as jose from "jose";
 import { NextRequest, NextResponse } from "next/server";
 
-async function createClientAssertion(
-  clientId: string,
-  tokenEndpoint: string,
-  privateKeyJWK: string
-): Promise<string> {
-  const { SignJWT, importJWK } = await import("jose");
+export const dynamic = "force-dynamic";
 
-  // Decode the base64 encoded JWK (same as GitHub example)
-  const jwkJson = Buffer.from(privateKeyJWK, "base64").toString();
-  const jwk = JSON.parse(jwkJson);
-  const privateKey = await importJWK(jwk, "RS256");
-
-  // Simple header without kid (matching GitHub example)
-  const header = {
-    alg: "RS256",
-    typ: "JWT",
-  };
-
-  // Simple payload (matching GitHub example)
-  const payload = {
-    iss: clientId,
-    sub: clientId,
-    aud: tokenEndpoint,
-  };
-
-  console.log("JWT payload:", payload);
-  console.log("JWT header:", header);
-
-  // Create JWT using Jose's built-in methods (matching GitHub example)
-  const jwt = await new SignJWT(payload)
-    .setProtectedHeader(header)
-    .setIssuedAt()
-    .setExpirationTime("2h")
+async function signJwt(privateKeyJwk: any, claims: any) {
+  const privateKey = await jose.importJWK(privateKeyJwk, "RS256");
+  const jwt = await new jose.SignJWT(claims)
+    .setProtectedHeader({ alg: "RS256", typ: "JWT" })
     .sign(privateKey);
-
-  console.log("JWT signed successfully");
   return jwt;
 }
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("=== TOKEN EXCHANGE START ===");
+    const { code, code_verifier, client_id, redirect_uri } =
+      await request.json();
 
-    const body = await request.json();
-    console.log("Request body:", body);
+    const tokenEndpoint =
+      process.env.NEXT_PUBLIC_TOKEN_ENDPOINT ||
+      "https://esignet.ida.fayda.et/v1/esignet/oauth/v2/token";
+    const privateKeyStr = process.env.PRIVATE_KEY;
 
-    const { code, code_verifier, client_id, redirect_uri } = body;
-
-    // Validate required parameters
-    if (!code || !code_verifier || !client_id || !redirect_uri) {
-      console.error("Missing required parameters:", {
-        code: !!code,
-        code_verifier: !!code_verifier,
-        client_id: !!client_id,
-        redirect_uri: !!redirect_uri,
-      });
-      return NextResponse.json(
-        { error: "Missing required parameters" },
-        { status: 400 }
-      );
+    if (!privateKeyStr) {
+      throw new Error("PRIVATE_KEY environment variable is not set.");
     }
 
-    // Check environment variables
-    const tokenEndpoint = process.env.TOKEN_ENDPOINT;
-    const clientAssertionType = process.env.CLIENT_ASSERTION_TYPE;
-    const privateKeyBase64 = process.env.PRIVATE_KEY;
+    const privateKeyJwk = JSON.parse(
+      Buffer.from(privateKeyStr, "base64").toString("utf-8")
+    );
 
-    console.log("Environment check:", {
-      tokenEndpoint: !!tokenEndpoint,
-      clientAssertionType: !!clientAssertionType,
-      privateKeyBase64: !!privateKeyBase64,
-      tokenEndpointValue: tokenEndpoint?.substring(0, 50),
-      clientAssertionTypeValue: clientAssertionType?.substring(0, 50),
-      privateKeyValue: privateKeyBase64?.substring(0, 20),
-    });
+    const claims = {
+      iss: client_id,
+      sub: client_id,
+      aud: tokenEndpoint,
+      exp: Math.floor(Date.now() / 1000) + 300, // 5 minutes expiration
+      iat: Math.floor(Date.now() / 1000),
+      jti: crypto.randomUUID(),
+    };
 
-    if (!tokenEndpoint || !clientAssertionType || !privateKeyBase64) {
-      console.error("Missing environment variables:", {
-        TOKEN_ENDPOINT: !!tokenEndpoint,
-        CLIENT_ASSERTION_TYPE: !!clientAssertionType,
-        PRIVATE_KEY: !!privateKeyBase64,
-        allEnvVars: Object.keys(process.env).filter(
-          (key) =>
-            key.includes("TOKEN") ||
-            key.includes("CLIENT") ||
-            key.includes("PRIVATE") ||
-            key.includes("ASSERTION")
-        ),
-      });
-      return NextResponse.json(
-        { error: "Server configuration error - missing environment variables" },
-        { status: 500 }
-      );
-    }
+    // Log the claims for debugging
+    console.log("Generating client_assertion with claims:", claims);
 
-    // Create client assertion JWT
-    let clientAssertion;
-    try {
-      console.log("Creating client assertion...");
-      clientAssertion = await createClientAssertion(
-        client_id,
-        tokenEndpoint,
-        privateKeyBase64
-      );
-      console.log("Client assertion created successfully");
-    } catch (jwtError) {
-      console.error("JWT creation error:", jwtError);
-      return NextResponse.json(
-        {
-          error: "Failed to create client assertion",
-          details:
-            jwtError instanceof Error ? jwtError.message : "Unknown JWT error",
-        },
-        { status: 500 }
-      );
-    }
+    const clientAssertion = await signJwt(privateKeyJwk, claims);
 
-    // Prepare token request parameters
-    const tokenParams = new URLSearchParams({
+    const params = new URLSearchParams({
       grant_type: "authorization_code",
-      code,
-      client_id,
-      redirect_uri,
-      code_verifier,
-      client_assertion_type: clientAssertionType,
+      code: code,
+      client_id: client_id,
+      redirect_uri: redirect_uri,
+      code_verifier: code_verifier,
+      client_assertion_type:
+        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
       client_assertion: clientAssertion,
     });
 
-    console.log(
-      "Token request parameters:",
-      Object.fromEntries(tokenParams.entries())
-    );
+    console.log("Sending request to token endpoint:", tokenEndpoint);
+    console.log("Request body (form-urlencoded):", params.toString());
 
-    // Make token request to Fayda
-    console.log("Making request to token endpoint:", tokenEndpoint);
-    const tokenResponse = await fetch(tokenEndpoint, {
+    const response = await fetch(tokenEndpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json",
-        "User-Agent": "FaydaPass/1.0",
       },
-      body: tokenParams.toString(),
+      body: params.toString(),
     });
 
-    console.log("Token response status:", tokenResponse.status);
-    console.log(
-      "Token response headers:",
-      Object.fromEntries(tokenResponse.headers.entries())
-    );
+    const responseBody = await response.json();
 
-    const responseText = await tokenResponse.text();
-    console.log("Token response body:", responseText);
-
-    let tokenData;
-    try {
-      tokenData = JSON.parse(responseText);
-    } catch (parseError) {
-      console.error("Failed to parse token response:", parseError);
+    if (!response.ok) {
+      console.error("Token response body:", responseBody);
       return NextResponse.json(
         {
-          error: "Invalid response format from token endpoint",
-          raw_response: responseText,
-          status: tokenResponse.status,
+          error: responseBody.error || "Token exchange failed",
+          error_description:
+            responseBody.error_description || "Unknown error from provider",
         },
-        { status: 500 }
+        { status: response.status }
       );
     }
 
-    if (!tokenResponse.ok) {
-      console.error("Token exchange failed:", tokenData);
-      return NextResponse.json(
-        {
-          error: tokenData.error || "Token exchange failed",
-          error_description: tokenData.error_description || "Unknown error",
-          status: tokenResponse.status,
-          details: tokenData,
-          raw_response: responseText,
-        },
-        { status: tokenResponse.status }
-      );
-    }
-
-    console.log("✅ Token exchange successful");
-    return NextResponse.json(tokenData);
+    return NextResponse.json(responseBody);
   } catch (error) {
-    console.error("Unexpected error in token exchange:", error);
+    console.error("Internal server error in /api/token:", error);
     return NextResponse.json(
       {
-        error: "Internal server error",
-        details: error instanceof Error ? error.message : "Unknown error",
+        error: "internal_server_error",
+        error_description:
+          error instanceof Error ? error.message : "An unknown error occurred",
       },
       { status: 500 }
     );
   }
-}
-
-export async function GET() {
-  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
 }
