@@ -3,6 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 
 export async function GET(request: NextRequest) {
   try {
+    console.log('Profile API called');
+    
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -13,7 +15,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get user from Authorization header
     const authHeader = request.headers.get("Authorization");
@@ -25,29 +27,34 @@ export async function GET(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
 
     if (authError || !user) {
+      console.error('Auth error:', authError);
       return NextResponse.json(
         { error: "Invalid token" },
         { status: 401 }
       );
     }
 
-    // Get user profile
-    const { data: profile, error: profileError } = await supabase
+    console.log('Getting profile for user:', user.id);
+    
+    // Get user profile using service role (bypasses RLS)
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('*')
       .eq('id', user.id)
       .single();
 
     if (profileError || !profile) {
+      console.error('Profile error:', profileError);
       return NextResponse.json(
         { error: "Profile not found" },
         { status: 404 }
       );
     }
 
+    console.log('Profile found:', profile.email);
     return NextResponse.json({ profile });
   } catch (error) {
     console.error("Error in profile route:", error);
@@ -70,7 +77,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get user from Authorization header
     const authHeader = request.headers.get("Authorization");
@@ -82,7 +89,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
 
     if (authError || !user) {
       return NextResponse.json(
@@ -93,8 +100,8 @@ export async function PUT(request: NextRequest) {
 
     const updates = await request.json();
 
-    // Update user profile
-    const { data: profile, error: updateError } = await supabase
+    // Update user profile using service role
+    const { data: profile, error: updateError } = await supabaseAdmin
       .from('user_profiles')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', user.id)

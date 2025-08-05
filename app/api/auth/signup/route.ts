@@ -5,6 +5,7 @@ export async function POST(request: NextRequest) {
   try {
     const { email, password, userData } = await request.json();
 
+    console.log('Signup API called with:', { email, userData });
     if (!email || !password || !userData) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -16,16 +17,17 @@ export async function POST(request: NextRequest) {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Missing Supabase environment variables');
       return NextResponse.json(
         { error: "Supabase not configured" },
         { status: 500 }
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Create auth user
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    // Create auth user with admin client
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
@@ -36,6 +38,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (authError) {
+      console.error('Auth user creation error:', authError);
       return NextResponse.json(
         { error: authError.message },
         { status: 400 }
@@ -49,34 +52,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate API key
-    const apiKey = `fp_${userData.plan_type}_${userData.name.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
+    console.log('Auth user created, creating profile...');
 
-    // Create user profile
-    const { data: profileData, error: profileError } = await supabase
-      .from('user_profiles')
-      .insert({
-        id: authData.user.id,
-        email,
-        name: userData.name,
-        role: userData.role,
-        company_name: userData.company_name,
-        plan_type: userData.plan_type,
-        api_key: apiKey,
-        metadata: userData.metadata || {}
-      })
-      .select()
-      .single();
+    // Use the database function to create profile (bypasses RLS)
+    const { data: profileData, error: profileError } = await supabaseAdmin
+      .rpc('create_user_profile', {
+        user_id: authData.user.id,
+        user_email: email,
+        user_name: userData.name,
+        user_role: userData.role,
+        user_company_name: userData.company_name,
+        user_plan_type: userData.plan_type,
+        user_metadata: userData.metadata || {}
+      });
 
     if (profileError) {
+      console.error('Profile creation error:', profileError);
       // Clean up auth user if profile creation fails
-      await supabase.auth.admin.deleteUser(authData.user.id);
+      try {
+        await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+      } catch (cleanupError) {
+        console.error('Failed to cleanup auth user:', cleanupError);
+      }
       return NextResponse.json(
         { error: profileError.message },
         { status: 400 }
       );
     }
 
+    console.log('Signup completed successfully');
     return NextResponse.json({
       data: {
         user: authData.user,

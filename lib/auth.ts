@@ -2,12 +2,18 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export const supabase =
   supabaseUrl && supabaseAnonKey
     ? createClient(supabaseUrl, supabaseAnonKey)
     : null;
 
+// Service role client for admin operations
+export const supabaseAdmin =
+  supabaseUrl && supabaseServiceKey
+    ? createClient(supabaseUrl, supabaseServiceKey)
+    : null;
 // User types and interfaces
 export type UserRole = 'admin' | 'developer' | 'company';
 export type PlanType = 'developer' | 'business';
@@ -60,11 +66,13 @@ export async function signUp(email: string, password: string, userData: {
   company_name?: string;
   metadata?: Record<string, any>;
 }) {
-  if (!supabase) {
+  if (!supabase || !supabaseAdmin) {
     return { data: null, error: new Error("Supabase not initialized") };
   }
 
   try {
+    console.log('Starting signup process for:', email);
+
     // Create auth user
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
@@ -78,6 +86,7 @@ export async function signUp(email: string, password: string, userData: {
     });
 
     if (authError) {
+      console.error('Auth signup error:', authError);
       return { data: null, error: authError };
     }
 
@@ -85,33 +94,35 @@ export async function signUp(email: string, password: string, userData: {
       return { data: null, error: new Error("No user data returned") };
     }
 
-    // Generate API key
-    const apiKey = `fp_${userData.plan_type}_${userData.name.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
+    console.log('Auth user created, creating profile...');
 
-    // Create user profile
-    const { data: profileData, error: profileError } = await supabase
-      .from('user_profiles')
-      .insert({
-        id: authData.user.id,
-        email,
-        name: userData.name,
-        role: userData.role,
-        company_name: userData.company_name,
-        plan_type: userData.plan_type,
-        api_key: apiKey,
-        metadata: userData.metadata || {}
-      })
-      .select()
-      .single();
+    // Use service role to create profile (bypasses RLS)
+    const { data: profileData, error: profileError } = await supabaseAdmin
+      .rpc('create_user_profile', {
+        user_id: authData.user.id,
+        user_email: email,
+        user_name: userData.name,
+        user_role: userData.role,
+        user_company_name: userData.company_name,
+        user_plan_type: userData.plan_type,
+        user_metadata: userData.metadata || {}
+      });
 
     if (profileError) {
+      console.error('Profile creation error:', profileError);
       // Clean up auth user if profile creation fails
-      await supabase.auth.admin.deleteUser(authData.user.id);
+      try {
+        await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+      } catch (cleanupError) {
+        console.error('Failed to cleanup auth user:', cleanupError);
+      }
       return { data: null, error: profileError };
     }
 
+    console.log('Profile created successfully:', profileData);
     return { data: { user: authData.user, profile: profileData }, error: null };
   } catch (error) {
+    console.error('Signup exception:', error);
     return { data: null, error: error as Error };
   }
 }
@@ -150,29 +161,43 @@ export async function getCurrentUser() {
 export async function getUserProfile(userId?: string): Promise<UserProfile | null> {
   if (!supabase) return null;
 
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError) {
-    console.error('Error getting current user:', userError);
+  let targetUserId = userId;
+  
+  if (!targetUserId) {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      console.error('Error getting current user:', userError);
+      return null;
+    }
+    targetUserId = user.id;
+  }
+
+  if (!targetUserId) {
+    console.error('No user ID available');
     return null;
   }
-  
-  const targetUserId = userId || user?.id;
 
-  if (!targetUserId) return null;
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', targetUserId)
+      .single();
+    if (error) {
+      console.error('Error fetching user profile:', error);
+      return null;
+    }
+    
+    if (!data) {
+      console.warn('No profile found for user:', targetUserId);
+      return null;
+    }
 
-  const { data, error } = await supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('id', targetUserId)
-    .single();
-
-  if (error) {
-    console.error('Error fetching user profile:', error);
+    return data;
+  } catch (exception) {
+    console.error('Exception fetching user profile:', exception);
     return null;
   }
-  
-  if (!data) return null;
-  return data;
 }
 
 export async function updateUserProfile(userId: string, updates: Partial<UserProfile>) {
