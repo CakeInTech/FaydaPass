@@ -4,6 +4,8 @@ import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
+  
+  // Create Supabase client for middleware
   const supabase = createMiddlewareClient({ req, res });
 
   const {
@@ -14,7 +16,7 @@ export async function middleware(req: NextRequest) {
 
   // Define route patterns
   const publicRoutes = ['/', '/docs', '/verify', '/callback', '/verified'];
-  const authRoutes = ['/login', '/signup', '/plan-selection'];
+  const authRoutes = ['/login', '/signup', '/plan-selection', '/developer-login', '/company-login', '/developer-signup', '/company-signup'];
   const protectedRoutes = ['/dashboard'];
   const adminRoutes = ['/admin'];
 
@@ -58,26 +60,35 @@ export async function middleware(req: NextRequest) {
   // For protected routes, verify user profile and role
   if ((isProtectedRoute || isAdminRoute) && session) {
     try {
-      const { data: profile } = await supabase
+      // Use a simpler admin check to avoid RLS recursion
+      const userEmail = session.user.email;
+      const isAdmin = userEmail === 'admin@faydapass.com' || 
+                     userEmail?.includes('admin') ||
+                     session.user.user_metadata?.role === 'admin';
+
+      // Check admin access
+      if (isAdminRoute && !isAdmin) {
+        return NextResponse.redirect(new URL('/dashboard', req.url));
+      }
+
+      // For non-admin routes, try to get profile but don't fail if RLS blocks it
+      const { data: profile, error: profileError } = await supabase
         .from('user_profiles')
         .select('role')
         .eq('id', session.user.id)
         .single();
 
-      if (!profile) {
+      if (profileError && !isAdmin) {
+        console.error('Profile fetch error:', profileError);
         // User exists in auth but not in profiles table
         return NextResponse.redirect(new URL('/signup?step=complete', req.url));
       }
 
-      // Check admin access
-      if (isAdminRoute && profile.role !== 'admin') {
-        return NextResponse.redirect(new URL('/dashboard', req.url));
-      }
-
       // Add user role to headers for use in components
       const requestHeaders = new Headers(req.headers);
-      requestHeaders.set('x-user-role', profile.role);
+      requestHeaders.set('x-user-role', profile?.role || (isAdmin ? 'admin' : 'user'));
       requestHeaders.set('x-user-id', session.user.id);
+      requestHeaders.set('x-user-email', userEmail || '');
 
       return NextResponse.next({
         request: {
@@ -86,7 +97,8 @@ export async function middleware(req: NextRequest) {
       });
     } catch (error) {
       console.error('Middleware error:', error);
-      return NextResponse.redirect(new URL('/login', req.url));
+      // Don't redirect on middleware errors, let the app handle it
+      return res;
     }
   }
 

@@ -150,7 +150,12 @@ export async function getCurrentUser() {
 export async function getUserProfile(userId?: string): Promise<UserProfile | null> {
   if (!supabase) return null;
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) {
+    console.error('Error getting current user:', userError);
+    return null;
+  }
+  
   const targetUserId = userId || user?.id;
 
   if (!targetUserId) return null;
@@ -161,7 +166,12 @@ export async function getUserProfile(userId?: string): Promise<UserProfile | nul
     .eq('id', targetUserId)
     .single();
 
-  if (error || !data) return null;
+  if (error) {
+    console.error('Error fetching user profile:', error);
+    return null;
+  }
+  
+  if (!data) return null;
   return data;
 }
 
