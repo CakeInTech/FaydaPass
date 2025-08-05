@@ -139,7 +139,7 @@ const DeveloperResources = () => {
         {/* New Call to Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-16">
           {/* GitHub Button */}
-          <a href="#github" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/CakeInTech/faydapass" target="_blank" rel="noopener noreferrer">
             <button className="group relative bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5 overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative flex items-center space-x-2">
@@ -151,12 +151,12 @@ const DeveloperResources = () => {
           </a>
 
           {/* Documentation Button */}
-          <a href="/docs">
+          <a href="/plan-selection">
             <button className="group relative bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-primary-500/50 transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5 overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-pink-400 to-rose-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative flex items-center space-x-2">
-                <BookOpen className="w-4 h-4" />
-                <span>Read the Docs</span>
+                <Users className="w-4 h-4" />
+                <span>Get Started</span>
                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" />
               </div>
             </button>

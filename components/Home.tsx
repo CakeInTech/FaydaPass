@@ -81,20 +81,20 @@ const Home = ({ isVisible = true }: { isVisible?: boolean }) => {
             className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 mb-8"
             variants={itemVariants}
           >
-            <Link href="/company-login">
+            <Link href="/plan-selection">
               <button className="w-full sm:w-auto group relative bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 transform hover:scale-105">
                 <div className="flex items-center justify-center">
                   <Building className="mr-2 w-5 h-5" />
-                  Company Login
+                  Choose Your Plan
                   <ArrowRight className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>
             </Link>
-            <Link href="/developer-login">
+            <Link href="/login">
               <button className="w-full sm:w-auto group relative border-2 border-white/30 text-white px-8 py-4 text-lg font-semibold rounded-xl hover:bg-white/10 backdrop-blur-sm transition-all duration-300 transform hover:scale-105">
                 <div className="flex items-center justify-center">
                   <Code className="mr-2 w-5 h-5" />
-                  Developer Login
+                  Sign In
                   <ArrowRight className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>

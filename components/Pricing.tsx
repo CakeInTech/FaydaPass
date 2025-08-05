@@ -118,13 +118,14 @@ export default function Pricing() {
               </ul>
 
               <button
-                className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 ${
+                onClick={() => window.location.href = '/plan-selection'}
+                className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
                   plan.popular
                     ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700"
                     : "bg-white/10 text-white border border-white/20 hover:bg-white/20"
                 }`}
               >
-                {plan.cta}
+                {plan.name === "Enterprise" ? "Contact Sales" : "Choose Plan"}
               </button>
             </div>
           ))}
