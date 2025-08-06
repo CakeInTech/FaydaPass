@@ -29,43 +29,40 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/hooks/useAuth";
-import { getVerificationRecords, getApiUsageStats, VerificationRecord } from "@/lib/auth";
+import { useSession, signOut } from "next-auth/react";
 import { toast } from "sonner";
 
 export default function UnifiedDashboard() {
   const router = useRouter();
-  const { user, profile, loading, signOut } = useAuth();
-  const [verifications, setVerifications] = useState<VerificationRecord[]>([]);
+  const { data: session, status } = useSession();
+  const [verifications, setVerifications] = useState<any[]>([]);
   const [apiStats, setApiStats] = useState<any>(null);
   const [dashboardLoading, setDashboardLoading] = useState(true);
 
+  const loading = status === "loading";
+  const user = session?.user;
+  const profile = session?.user;
+
   useEffect(() => {
-    if (!loading && !user) {
+    if (status === "unauthenticated") {
       router.push('/login');
       return;
     }
 
-    if (user && profile) {
+    if (session?.user) {
       loadDashboardData();
     }
-  }, [user, profile, loading, router]);
+  }, [session, status, router]);
 
   const loadDashboardData = async () => {
-    if (!user || !profile) return;
+    if (!session?.user) return;
 
     try {
       setDashboardLoading(true);
 
-      // Load verifications
-      const verificationsData = await getVerificationRecords(
-        profile.role === 'admin' ? undefined : user.id
-      );
-      setVerifications(verificationsData);
-
-      // Load API usage stats
-      const statsData = await getApiUsageStats(user.id);
-      setApiStats(statsData);
+      // Load verifications (mock data for now)
+      setVerifications([]);
+      setApiStats({ total_calls: 0, success_rate: 100, avg_response_time: 150, failed_calls: 0 });
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -75,7 +72,7 @@ export default function UnifiedDashboard() {
 
   const handleSignOut = async () => {
     try {
-      await signOut();
+      await signOut({ redirect: false });
       router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
@@ -83,7 +80,7 @@ export default function UnifiedDashboard() {
   };
 
   const copyApiKey = () => {
-    if (profile?.api_key) {
+    if (session?.user?.api_key) {
       navigator.clipboard.writeText(profile.api_key);
       toast.success('API key copied to clipboard');
     }
@@ -128,7 +125,7 @@ export default function UnifiedDashboard() {
     },
   };
 
-  const config = roleConfig[profile.role];
+  const config = roleConfig[profile?.role as keyof typeof roleConfig] || roleConfig.developer;
 
   // Calculate stats
   const totalVerifications = verifications.length;
@@ -152,11 +149,11 @@ export default function UnifiedDashboard() {
                     {config.title}
                   </h1>
                   <p className="text-white/60 text-sm">
-                    {profile.email}
+                    {profile?.email}
                   </p>
                 </div>
                 <Badge className={`bg-gradient-to-r ${config.gradient} text-white border-0`}>
-                  {profile.plan_type} plan
+                  {profile?.plan_type} plan
                 </Badge>
               </div>
               <div className="flex items-center space-x-4">
@@ -196,12 +193,12 @@ export default function UnifiedDashboard() {
             className="mb-8"
           >
             <h2 className="text-3xl font-bold text-white mb-2">
-              Welcome back, {profile.name.split(' ')[0]}!
+              Welcome back, {profile?.name?.split(' ')[0]}!
             </h2>
             <p className="text-white/70">
-              {profile.role === 'admin' && 'Manage the FaydaPass platform and monitor all activities.'}
-              {profile.role === 'developer' && 'Build amazing applications with government-backed KYC verification.'}
-              {profile.role === 'company' && `Manage KYC verifications for ${profile.company_name}.`}
+              {profile?.role === 'admin' && 'Manage the FaydaPass platform and monitor all activities.'}
+              {profile?.role === 'developer' && 'Build amazing applications with government-backed KYC verification.'}
+              {profile?.role === 'company' && `Manage KYC verifications for ${profile?.company_name}.`}
             </p>
           </motion.div>
 
@@ -272,7 +269,7 @@ export default function UnifiedDashboard() {
                 <TabsTrigger value="overview" className="data-[state=active]:bg-white/20">
                   Overview
                 </TabsTrigger>
-                {profile.role !== 'admin' && (
+                {profile?.role !== 'admin' && (
                   <TabsTrigger value="api" className="data-[state=active]:bg-white/20">
                     API Access
                   </TabsTrigger>
@@ -280,7 +277,7 @@ export default function UnifiedDashboard() {
                 <TabsTrigger value="verifications" className="data-[state=active]:bg-white/20">
                   Verifications
                 </TabsTrigger>
-                {profile.role === 'admin' && (
+                {profile?.role === 'admin' && (
                   <>
                     <TabsTrigger value="users" className="data-[state=active]:bg-white/20">
                       Users
@@ -290,7 +287,7 @@ export default function UnifiedDashboard() {
                     </TabsTrigger>
                   </>
                 )}
-                {profile.role === 'company' && (
+                {profile?.role === 'company' && (
                   <TabsTrigger value="team" className="data-[state=active]:bg-white/20">
                     Team
                   </TabsTrigger>
@@ -306,7 +303,7 @@ export default function UnifiedDashboard() {
                       <CardTitle className="text-white">Quick Actions</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      {profile.role === 'developer' && (
+                      {profile?.role === 'developer' && (
                         <>
                           <Button className="w-full justify-start" variant="ghost">
                             <Code className="w-4 h-4 mr-2" />
@@ -323,7 +320,7 @@ export default function UnifiedDashboard() {
                         </>
                       )}
                       
-                      {profile.role === 'company' && (
+                      {profile?.role === 'company' && (
                         <>
                           <Button className="w-full justify-start" variant="ghost">
                             <Users className="w-4 h-4 mr-2" />
@@ -340,7 +337,7 @@ export default function UnifiedDashboard() {
                         </>
                       )}
 
-                      {profile.role === 'admin' && (
+                      {profile?.role === 'admin' && (
                         <>
                           <Button className="w-full justify-start" variant="ghost">
                             <Users className="w-4 h-4 mr-2" />
@@ -403,7 +400,7 @@ export default function UnifiedDashboard() {
                             <Activity className="w-12 h-12 text-white/40 mx-auto mb-4" />
                             <p className="text-white/60">No verifications yet</p>
                             <p className="text-white/40 text-sm">
-                              {profile.role === 'developer' 
+                              {profile?.role === 'developer' 
                                 ? 'Start integrating FaydaPass to see verification data'
                                 : 'Begin verifying users to see activity here'
                               }
@@ -417,7 +414,7 @@ export default function UnifiedDashboard() {
               </TabsContent>
 
               {/* API Access Tab */}
-              {profile.role !== 'admin' && (
+              {profile?.role !== 'admin' && (
                 <TabsContent value="api" className="space-y-6">
                   <Card className="backdrop-blur-xl bg-white/5 border-white/10">
                     <CardHeader>
@@ -434,7 +431,7 @@ export default function UnifiedDashboard() {
                         <div className="flex items-center space-x-3">
                           <Input
                             type="text"
-                            value={profile.api_key || 'Loading...'}
+                            value={profile?.api_key || 'Loading...'}
                             readOnly
                             className="bg-white/10 border-white/20 text-white font-mono text-sm"
                           />
@@ -466,7 +463,7 @@ export default function UnifiedDashboard() {
                         <div>
                           <p className="text-white/60 text-sm">Rate Limit</p>
                           <p className="text-white text-sm">
-                            {profile.plan_type === 'developer' ? '1,000' : '50,000'}/month
+                            {profile?.plan_type === 'developer' ? '1,000' : '50,000'}/month
                           </p>
                         </div>
                       </div>
@@ -505,7 +502,7 @@ export default function UnifiedDashboard() {
                 <Card className="backdrop-blur-xl bg-white/5 border-white/10">
                   <CardHeader>
                     <CardTitle className="text-white">
-                      {profile.role === 'admin' ? 'All Verifications' : 'Your Verifications'}
+                      {profile?.role === 'admin' ? 'All Verifications' : 'Your Verifications'}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -552,7 +549,7 @@ export default function UnifiedDashboard() {
               </TabsContent>
 
               {/* Admin-specific tabs */}
-              {profile.role === 'admin' && (
+              {profile?.role === 'admin' && (
                 <>
                   <TabsContent value="users" className="space-y-6">
                     <Card className="backdrop-blur-xl bg-white/5 border-white/10">
@@ -583,7 +580,7 @@ export default function UnifiedDashboard() {
               )}
 
               {/* Company-specific team tab */}
-              {profile.role === 'company' && (
+              {profile?.role === 'company' && (
                 <TabsContent value="team" className="space-y-6">
                   <Card className="backdrop-blur-xl bg-white/5 border-white/10">
                     <CardHeader>

@@ -1,158 +1,72 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { withAuth } from "next-auth/middleware";
 
-export async function middleware(req: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: req.headers,
-    },
-  });
+export default withAuth(
+  function middleware(req) {
+    // Add any additional middleware logic here if needed
+    console.log("Middleware executed for:", req.nextUrl.pathname);
+  },
+  {
+    callbacks: {
+      authorized: ({ token, req }) => {
+        const { pathname } = req.nextUrl;
 
-  try {
-    // Create Supabase client for middleware with proper error handling
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            try {
-              return req.cookies.get(name)?.value;
-            } catch (error) {
-              console.warn('Cookie get error:', error);
-              return undefined;
-            }
-          },
-          set(name: string, value: string, options: CookieOptions) {
-            try {
-              req.cookies.set({
-                name,
-                value,
-                ...options,
-              });
-              response = NextResponse.next({
-                request: {
-                  headers: req.headers,
-                },
-              });
-              response.cookies.set({
-                name,
-                value,
-                ...options,
-              });
-            } catch (error) {
-              console.warn('Cookie set error:', error);
-            }
-          },
-          remove(name: string, options: CookieOptions) {
-            try {
-              req.cookies.set({
-                name,
-                value: '',
-                ...options,
-              });
-              response = NextResponse.next({
-                request: {
-                  headers: req.headers,
-                },
-              });
-              response.cookies.set({
-                name,
-                value: '',
-                ...options,
-              });
-            } catch (error) {
-              console.warn('Cookie remove error:', error);
-            }
-          },
-        },
-      }
-    );
+        // Define route patterns
+        const publicRoutes = ['/', '/docs', '/verify', '/callback', '/verified', '/plan-selection'];
+        const authRoutes = ['/login', '/signup'];
+        const protectedRoutes = ['/dashboard'];
+        const adminRoutes = ['/admin'];
 
-    // Get session with error handling
-    let session = null;
-    try {
-      const { data: { session: sessionData }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) {
-        console.warn('Session error:', sessionError);
-      } else {
-        session = sessionData;
-      }
-    } catch (error) {
-      console.warn('Session fetch error:', error);
-    }
+        // Check route types
+        const isPublicRoute = publicRoutes.some(route => 
+          pathname === route || pathname.startsWith(route)
+        );
+        const isAuthRoute = authRoutes.some(route => 
+          pathname === route || pathname.startsWith(route)
+        );
+        const isProtectedRoute = protectedRoutes.some(route => 
+          pathname === route || pathname.startsWith(route)
+        );
+        const isAdminRoute = adminRoutes.some(route => 
+          pathname === route || pathname.startsWith(route)
+        );
 
-    const { pathname } = req.nextUrl;
+        // Allow public routes
+        if (isPublicRoute) {
+          return true;
+        }
 
-    // Define route patterns
-    const publicRoutes = ['/', '/docs', '/verify', '/callback', '/verified'];
-    const authRoutes = ['/login', '/signup', '/plan-selection'];
-    const protectedRoutes = ['/dashboard'];
-    const adminRoutes = ['/admin'];
+        // Allow auth routes for unauthenticated users
+        if (isAuthRoute && !token) {
+          return true;
+        }
 
-    // Check route types
-    const isPublicRoute = publicRoutes.some(route => 
-      pathname === route || pathname.startsWith(route)
-    );
-    const isAuthRoute = authRoutes.some(route => 
-      pathname === route || pathname.startsWith(route)
-    );
-    const isProtectedRoute = protectedRoutes.some(route => 
-      pathname === route || pathname.startsWith(route)
-    );
-    const isAdminRoute = adminRoutes.some(route => 
-      pathname === route || pathname.startsWith(route)
-    );
+        // Redirect authenticated users away from auth routes
+        if (isAuthRoute && token) {
+          return false; // This will redirect to the default page
+        }
 
-    // Allow public routes
-    if (isPublicRoute) {
-      return response;
-    }
+        // Require authentication for protected routes
+        if (isProtectedRoute || isAdminRoute) {
+          if (!token) {
+            return false; // This will redirect to login
+          }
 
-    // Redirect authenticated users away from auth routes
-    if (isAuthRoute && session) {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
-    }
+          // Check admin access
+          if (isAdminRoute) {
+            return token.role === 'admin';
+          }
 
-    // Redirect unauthenticated users to login
-    if ((isProtectedRoute || isAdminRoute) && !session) {
-      const redirectUrl = new URL('/login', req.url);
-      redirectUrl.searchParams.set('redirectTo', pathname);
-      return NextResponse.redirect(redirectUrl);
-    }
+          return true;
+        }
 
-    // For admin routes, check admin status using simple email check
-    if (isAdminRoute && session) {
-      const userEmail = session.user.email;
-      const isAdmin = userEmail === 'admin@faydapass.com' || 
-                     userEmail?.includes('admin') ||
-                     session.user.user_metadata?.role === 'admin';
-
-      if (!isAdmin) {
-        return NextResponse.redirect(new URL('/dashboard', req.url));
-      }
-    }
-
-    // Add user context to headers (for debugging)
-    const requestHeaders = new Headers(req.headers);
-    if (session?.user) {
-      requestHeaders.set('x-user-id', session.user.id);
-      requestHeaders.set('x-user-email', session.user.email || '');
-    }
-
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
+        return true;
       },
-    });
-
-  } catch (error) {
-    console.error('Middleware error:', error);
-    // Return response without modification on errors
-    return response;
+    },
+    pages: {
+      signIn: '/login',
+    },
   }
-}
+);
 
 export const config = {
   matcher: [

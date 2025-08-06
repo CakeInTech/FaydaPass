@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import bcrypt from "bcryptjs";
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password, userData } = await request.json();
 
     console.log('Signup API called with:', { email, userData });
+    
     if (!email || !password || !userData) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -25,6 +27,20 @@ export async function POST(request: NextRequest) {
     }
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Check if user already exists
+    const { data: existingProfile } = await supabaseAdmin
+      .from('user_profiles')
+      .select('email')
+      .eq('email', email)
+      .single();
+
+    if (existingProfile) {
+      return NextResponse.json(
+        { error: "User already exists" },
+        { status: 400 }
+      );
+    }
 
     // Create auth user with admin client
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
@@ -54,17 +70,24 @@ export async function POST(request: NextRequest) {
 
     console.log('Auth user created, creating profile...');
 
-    // Use the database function to create profile (bypasses RLS)
+    // Generate API key
+    const apiKey = `fp_${userData.plan_type}_${userData.name.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
+
+    // Create user profile directly (bypassing RLS with service role)
     const { data: profileData, error: profileError } = await supabaseAdmin
-      .rpc('create_user_profile', {
-        user_id: authData.user.id,
-        user_email: email,
-        user_name: userData.name,
-        user_role: userData.role,
-        user_company_name: userData.company_name,
-        user_plan_type: userData.plan_type,
-        user_metadata: userData.metadata || {}
-      });
+      .from('user_profiles')
+      .insert({
+        id: authData.user.id,
+        email: email,
+        name: userData.name,
+        role: userData.role,
+        company_name: userData.company_name,
+        api_key: apiKey,
+        plan_type: userData.plan_type,
+        metadata: userData.metadata || {}
+      })
+      .select()
+      .single();
 
     if (profileError) {
       console.error('Profile creation error:', profileError);

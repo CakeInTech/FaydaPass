@@ -17,9 +17,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { signUp, PlanType, UserRole } from "@/lib/auth";
 import { toast } from "sonner";
 import Link from "next/link";
+
+// Define types locally
+type PlanType = 'developer' | 'business';
+type UserRole = 'admin' | 'developer' | 'company';
 
 interface FormData {
   name: string;
@@ -121,39 +124,45 @@ function SignupContent() {
     try {
       const role: UserRole = planType === 'business' ? 'company' : 'developer';
       
-      const { data, error } = await signUp(
-        formData.email,
-        formData.password,
-        {
-          name: formData.name,
-          role,
-          plan_type: planType,
-          company_name: formData.company_name,
-          metadata: {
-            industry: formData.industry,
-            use_case: formData.use_case,
-            project_description: formData.project_description,
-            onboarding_completed: false,
+      // Make API call to signup endpoint
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          userData: {
+            name: formData.name,
+            role,
+            plan_type: planType,
+            company_name: formData.company_name,
+            metadata: {
+              industry: formData.industry,
+              use_case: formData.use_case,
+              project_description: formData.project_description,
+              onboarding_completed: false,
+            }
           }
-        }
-      );
+        }),
+      });
 
-      if (error) {
-        console.error('Signup error:', error);
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error('Signup error:', result.error);
         toast.error('Signup failed', {
-          description: error.message,
+          description: result.error,
         });
         return;
       }
 
-      if (data) {
+      if (result.data) {
         toast.success('Account created successfully!', {
           description: 'Welcome to FaydaPass! Redirecting to your dashboard...',
         });
 
-        // Store user data for dashboard
-        sessionStorage.setItem('user_profile', JSON.stringify(data.profile));
-        
         // Redirect to dashboard
         router.push('/dashboard');
       }

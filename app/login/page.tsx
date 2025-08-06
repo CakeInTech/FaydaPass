@@ -10,9 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 function LoginContent() {
   const router = useRouter();
@@ -24,15 +24,6 @@ function LoginContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  const { user, profile, signIn } = useAuth();
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (user && profile) {
-      router.replace('/dashboard');
-    }
-  }, [user, profile, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,13 +31,17 @@ function LoginContent() {
     setError('');
 
     try {
-      const { error } = await signIn(email, password);
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
 
-      if (error) {
-        console.error('Login error:', error);
-        setError(error.message);
+      if (result?.error) {
+        console.error('Login error:', result.error);
+        setError('Invalid email or password');
         toast.error('Login failed', {
-          description: error.message,
+          description: 'Invalid email or password',
         });
         return;
       }
@@ -56,7 +51,7 @@ function LoginContent() {
       });
 
       // Redirect to intended destination
-      router.replace(redirectTo);
+      router.push(redirectTo);
     } catch (error) {
       console.error('Login error:', error);
       setError('An unexpected error occurred');
