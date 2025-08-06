@@ -8,6 +8,7 @@ import {
   X
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import Link from "next/link"
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
