@@ -9,7 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { toast } from "sonner";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
@@ -17,46 +23,46 @@ import { signIn } from "next-auth/react";
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') || '/dashboard';
-  
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const redirectTo = searchParams.get("redirectTo") || "/dashboard";
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const result = await signIn('credentials', {
+      const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
 
       if (result?.error) {
-        console.error('Login error:', result.error);
-        setError('Invalid email or password');
-        toast.error('Login failed', {
-          description: 'Invalid email or password',
+        console.error("Login error:", result.error);
+        setError("Invalid email or password");
+        toast.error("Login failed", {
+          description: "Invalid email or password",
         });
         return;
       }
 
-      toast.success('Login successful', {
-        description: 'Welcome back to FaydaPass!',
+      toast.success("Login successful", {
+        description: "Welcome back to FaydaPass!",
       });
 
       // Redirect to intended destination
       router.push(redirectTo);
     } catch (error) {
-      console.error('Login error:', error);
-      setError('An unexpected error occurred');
-      toast.error('Login failed', {
-        description: 'An unexpected error occurred',
+      console.error("Login error:", error);
+      setError("An unexpected error occurred");
+      toast.error("Login failed", {
+        description: "An unexpected error occurred",
       });
     } finally {
       setLoading(false);
@@ -128,17 +134,21 @@ function LoginContent() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white"
                     >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {showPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
                     </button>
                   </div>
                 </div>
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
                   disabled={loading}
                 >
-                  {loading ? 'Signing in...' : 'Sign In'}
+                  {loading ? "Signing in..." : "Sign In"}
                 </Button>
               </form>
 
@@ -154,12 +164,16 @@ function LoginContent() {
 
               {/* Demo Credentials */}
               <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                <p className="text-blue-300 text-sm font-medium mb-2">Demo Credentials:</p>
+                <p className="text-blue-300 text-sm font-medium mb-2">
+                  Demo Credentials:
+                </p>
                 <div className="space-y-1 text-xs text-blue-200">
                   <p>Admin: admin@faydapass.com</p>
                   <p>Developer: developer@example.com</p>
                   <p>Company: company@example.com</p>
-                  <p className="text-blue-300 mt-2">Password: Use the password you set during setup</p>
+                  <p className="text-blue-300 mt-2">
+                    Password: Use the password you set during setup
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -172,13 +186,15 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <BackgroundWrapper>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-white text-xl">Loading...</div>
-        </div>
-      </BackgroundWrapper>
-    }>
+    <Suspense
+      fallback={
+        <BackgroundWrapper>
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-white text-xl">Loading...</div>
+          </div>
+        </BackgroundWrapper>
+      }
+    >
       <LoginContent />
     </Suspense>
   );

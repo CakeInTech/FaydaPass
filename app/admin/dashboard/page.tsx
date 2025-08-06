@@ -9,6 +9,7 @@ import BackgroundWrapper from "@/components/BackgroundWrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import SignOutButton from "@/components/SignOutButton";
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
@@ -96,14 +97,17 @@ export default function AdminDashboard() {
                 </p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              onClick={() => router.push("/dashboard")}
-              className="text-white/70 hover:text-white hover:bg-white/10"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                onClick={() => router.push("/dashboard")}
+                className="text-white/70 hover:text-white hover:bg-white/10"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Button>
+              <SignOutButton />
+            </div>
           </motion.div>
 
           {/* Stats Cards */}

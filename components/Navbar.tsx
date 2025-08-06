@@ -30,6 +30,12 @@ const Navbar = () => {
       icon: Code,
       description: "Test the SDK",
     },
+    {
+      name: "SDK Examples",
+      href: "/sdk-examples",
+      icon: BookOpen,
+      description: "SDK Documentation",
+    },
   ];
 
   return (
