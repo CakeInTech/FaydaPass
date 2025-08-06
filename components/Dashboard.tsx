@@ -23,6 +23,7 @@ import {
   Smartphone,
   Globe,
   LogOut,
+  Code,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -60,14 +61,18 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
       // Admin sees all data
       setVerifications(mockVerifications);
       setApiUsage(mockApiUsage);
-    } else if (companyId) {
-      // Company/Developer sees their own data
+    } else if (userRole === "company" && companyId) {
+      // Company users see their company data
       const company = mockCompanies.find((c) => c.id === companyId);
       if (company) {
         setSelectedCompany(company);
         setVerifications(getVerificationsByCompany(companyId));
         setApiUsage(getApiUsageByCompany(companyId));
       }
+    } else if (userRole === "developer") {
+      // Developers see developer-specific data (no company)
+      setVerifications([]); // Developers don't have verifications yet
+      setApiUsage([]); // Developers don't have API usage yet
     }
   }, [userRole, companyId]);
 
@@ -120,7 +125,11 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
         <Card className="backdrop-blur-xl bg-white/5 border-white/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white/70">
-              {userRole === "admin" ? "Total Companies" : "Total Verifications"}
+              {userRole === "admin"
+                ? "Total Companies"
+                : userRole === "developer"
+                ? "API Key"
+                : "Total Verifications"}
             </CardTitle>
             <Users className="h-4 w-4 text-white/50" />
           </CardHeader>
@@ -128,11 +137,15 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
             <div className="text-2xl font-bold text-white">
               {userRole === "admin"
                 ? overallStats.totalCompanies
+                : userRole === "developer"
+                ? "fp_dev_..."
                 : selectedCompany?.stats.totalVerifications || 0}
             </div>
             <p className="text-xs text-white/50">
               {userRole === "admin"
                 ? "Registered companies"
+                : userRole === "developer"
+                ? "Your API key"
                 : "All time verifications"}
             </p>
           </CardContent>
@@ -141,7 +154,11 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
         <Card className="backdrop-blur-xl bg-white/5 border-white/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white/70">
-              {userRole === "admin" ? "Total Verifications" : "Success Rate"}
+              {userRole === "admin"
+                ? "Total Verifications"
+                : userRole === "developer"
+                ? "Plan Type"
+                : "Success Rate"}
             </CardTitle>
             <Shield className="h-4 w-4 text-white/50" />
           </CardHeader>
@@ -149,11 +166,15 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
             <div className="text-2xl font-bold text-white">
               {userRole === "admin"
                 ? overallStats.totalVerifications
+                : userRole === "developer"
+                ? "Developer"
                 : `${selectedCompany?.stats.successRate || 0}%`}
             </div>
             <p className="text-xs text-white/50">
               {userRole === "admin"
                 ? "All verifications"
+                : userRole === "developer"
+                ? "Your plan"
                 : "Successful verifications"}
             </p>
           </CardContent>
@@ -162,7 +183,11 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
         <Card className="backdrop-blur-xl bg-white/5 border-white/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white/70">
-              {userRole === "admin" ? "Success Rate" : "API Calls"}
+              {userRole === "admin"
+                ? "Success Rate"
+                : userRole === "developer"
+                ? "API Calls"
+                : "API Calls"}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-white/50" />
           </CardHeader>
@@ -170,10 +195,16 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
             <div className="text-2xl font-bold text-white">
               {userRole === "admin"
                 ? `${overallStats.successRate}%`
+                : userRole === "developer"
+                ? "0"
                 : selectedCompany?.stats.apiCalls || 0}
             </div>
             <p className="text-xs text-white/50">
-              {userRole === "admin" ? "Overall success rate" : "This month"}
+              {userRole === "admin"
+                ? "Overall success rate"
+                : userRole === "developer"
+                ? "This month"
+                : "This month"}
             </p>
           </CardContent>
         </Card>
@@ -181,7 +212,11 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
         <Card className="backdrop-blur-xl bg-white/5 border-white/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white/70">
-              {userRole === "admin" ? "API Calls" : "Remaining Calls"}
+              {userRole === "admin"
+                ? "API Calls"
+                : userRole === "developer"
+                ? "Remaining Calls"
+                : "Remaining Calls"}
             </CardTitle>
             <Activity className="h-4 w-4 text-white/50" />
           </CardHeader>
@@ -189,10 +224,16 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
             <div className="text-2xl font-bold text-white">
               {userRole === "admin"
                 ? overallStats.totalApiCalls
+                : userRole === "developer"
+                ? "1000"
                 : selectedCompany?.stats.remainingCalls || 0}
             </div>
             <p className="text-xs text-white/50">
-              {userRole === "admin" ? "Total API calls" : "This month"}
+              {userRole === "admin"
+                ? "Total API calls"
+                : userRole === "developer"
+                ? "Free tier limit"
+                : "This month"}
             </p>
           </CardContent>
         </Card>
@@ -203,47 +244,59 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
         <CardHeader>
           <CardTitle className="text-white flex items-center">
             <Activity className="w-5 h-5 mr-2" />
-            Recent Verifications
+            {userRole === "developer"
+              ? "Recent Activity"
+              : "Recent Verifications"}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {verifications.slice(0, 5).map((verification) => (
-              <div
-                key={verification.id}
-                className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="text-white font-semibold">
-                      {verification.user_data.name || verification.user_email}
-                    </h4>
-                    <p className="text-white/70 text-sm">
-                      {verification.user_email}
-                    </p>
-                    <p className="text-white/50 text-xs">
-                      {formatDate(verification.created_at)}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <Badge className={getStatusColor(verification.status)}>
-                    {getStatusIcon(verification.status)}
-                    <span className="ml-1 capitalize">
-                      {verification.status}
-                    </span>
-                  </Badge>
-                  {verification.fayda_id && (
-                    <span className="text-white/70 text-sm">
-                      ID: {verification.fayda_id}
-                    </span>
-                  )}
-                </div>
+            {userRole === "developer" ? (
+              <div className="text-center py-8 text-white/70">
+                <Code className="w-12 h-12 mx-auto mb-4 text-white/50" />
+                <p className="text-lg font-semibold mb-2">No Activity Yet</p>
+                <p className="text-sm">
+                  Start integrating our SDK to see your activity here.
+                </p>
               </div>
-            ))}
+            ) : (
+              verifications.slice(0, 5).map((verification) => (
+                <div
+                  key={verification.id}
+                  className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                      <Shield className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-white font-semibold">
+                        {verification.user_data.name || verification.user_email}
+                      </h4>
+                      <p className="text-white/70 text-sm">
+                        {verification.user_email}
+                      </p>
+                      <p className="text-white/50 text-xs">
+                        {formatDate(verification.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <Badge className={getStatusColor(verification.status)}>
+                      {getStatusIcon(verification.status)}
+                      <span className="ml-1 capitalize">
+                        {verification.status}
+                      </span>
+                    </Badge>
+                    {verification.fayda_id && (
+                      <span className="text-white/70 text-sm">
+                        ID: {verification.fayda_id}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
@@ -383,6 +436,108 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
     </Card>
   );
 
+  const renderSDKDocs = () => (
+    <Card className="backdrop-blur-xl bg-white/5 border-white/10">
+      <CardHeader>
+        <CardTitle className="text-white flex items-center justify-between">
+          <div className="flex items-center">
+            <Code className="w-5 h-5 mr-2" />
+            SDK Documentation
+          </div>
+          <div className="flex space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-white border-white/20 hover:bg-white/10"
+              onClick={() => router.push("/sdk-examples")}
+            >
+              <Globe className="w-4 h-4 mr-2" />
+              View Full Docs
+            </Button>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="bg-white/5 border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white text-lg">
+                  Quick Start
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="bg-gray-900 rounded-lg p-4">
+                    <pre className="text-green-400 text-sm">
+                      {`npm install @faydapass/sdk
+
+import FaydaPassSDK from '@faydapass/sdk';
+
+const faydaPass = new FaydaPassSDK('your-api-key');`}
+                    </pre>
+                  </div>
+                  <p className="text-white/70 text-sm">
+                    Get started with our SDK in just 3 lines of code.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/5 border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white text-lg">
+                  API Reference
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <h4 className="text-white font-semibold">Methods</h4>
+                    <ul className="text-white/70 text-sm space-y-1">
+                      <li>
+                        •{" "}
+                        <code className="text-green-400">
+                          initiateVerification()
+                        </code>
+                      </li>
+                      <li>
+                        •{" "}
+                        <code className="text-green-400">
+                          getVerificationStatus()
+                        </code>
+                      </li>
+                      <li>
+                        •{" "}
+                        <code className="text-green-400">validateApiKey()</code>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="bg-white/5 border-white/10">
+            <CardHeader>
+              <CardTitle className="text-white text-lg">Your API Key</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-gray-900 rounded-lg p-4">
+                <code className="text-green-400 text-sm">
+                  fp_dev_your_api_key_here
+                </code>
+              </div>
+              <p className="text-white/70 text-sm mt-2">
+                Use this API key to authenticate your requests.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   const renderCompanies = () => (
     <div className="space-y-6">
       {mockCompanies.map((company) => (
@@ -478,11 +633,15 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
             <h1 className="text-3xl font-bold text-white">
               {userRole === "admin"
                 ? "Admin Dashboard"
+                : userRole === "developer"
+                ? "Developer Dashboard"
                 : `${selectedCompany?.name || "Company"} Dashboard`}
             </h1>
             <p className="text-white/70">
               {userRole === "admin"
                 ? "Monitor all companies and verifications"
+                : userRole === "developer"
+                ? "Manage your API keys and usage"
                 : "Track your verifications and API usage"}
             </p>
           </div>
@@ -511,7 +670,15 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
           onValueChange={setActiveTab}
           className="space-y-6"
         >
-          <TabsList className="grid w-full grid-cols-4 bg-white/5 border border-white/10">
+          <TabsList
+            className={`grid w-full ${
+              userRole === "admin"
+                ? "grid-cols-4"
+                : userRole === "developer"
+                ? "grid-cols-3"
+                : "grid-cols-3"
+            } bg-white/5 border border-white/10`}
+          >
             <TabsTrigger
               value="overview"
               className="text-white data-[state=active]:bg-white/10"
@@ -519,13 +686,15 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
               <BarChart3 className="w-4 h-4 mr-2" />
               Overview
             </TabsTrigger>
-            <TabsTrigger
-              value="verifications"
-              className="text-white data-[state=active]:bg-white/10"
-            >
-              <Shield className="w-4 h-4 mr-2" />
-              Verifications
-            </TabsTrigger>
+            {userRole !== "developer" && (
+              <TabsTrigger
+                value="verifications"
+                className="text-white data-[state=active]:bg-white/10"
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Verifications
+              </TabsTrigger>
+            )}
             <TabsTrigger
               value="api-usage"
               className="text-white data-[state=active]:bg-white/10"
@@ -533,6 +702,15 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
               <Activity className="w-4 h-4 mr-2" />
               API Usage
             </TabsTrigger>
+            {userRole === "developer" && (
+              <TabsTrigger
+                value="sdk"
+                className="text-white data-[state=active]:bg-white/10"
+              >
+                <Code className="w-4 h-4 mr-2" />
+                SDK Docs
+              </TabsTrigger>
+            )}
             {userRole === "admin" && (
               <TabsTrigger
                 value="companies"
@@ -555,6 +733,12 @@ export default function Dashboard({ userRole, companyId }: DashboardProps) {
           <TabsContent value="api-usage" className="space-y-6">
             {renderApiUsage()}
           </TabsContent>
+
+          {userRole === "developer" && (
+            <TabsContent value="sdk" className="space-y-6">
+              {renderSDKDocs()}
+            </TabsContent>
+          )}
 
           {userRole === "admin" && (
             <TabsContent value="companies" className="space-y-6">

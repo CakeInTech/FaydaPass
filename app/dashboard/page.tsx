@@ -34,7 +34,11 @@ export default function DashboardPage() {
   }
 
   const userRole = session?.user?.role || "developer";
-  const companyId = session?.user?.id || "comp_001"; // Default to first company for demo
+
+  // For developers, don't set a companyId (they see developer dashboard)
+  // For company users, use their actual company ID
+  const companyId =
+    userRole === "developer" ? undefined : session?.user?.id || "comp_001";
 
   return (
     <BackgroundWrapper>

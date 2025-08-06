@@ -35,17 +35,21 @@ export async function POST(request: NextRequest) {
       const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
       // Check if user already exists
-      const { data: existingProfile } = await supabaseAdmin
-        .from("user_profiles")
-        .select("email")
-        .eq("email", email)
-        .single()
-        .catch((error) => {
-          console.error("Database connection error:", error);
-          return { data: null, error };
-        });
+      const { data: existingProfiles, error: existingError } =
+        await supabaseAdmin
+          .from("user_profiles")
+          .select("email")
+          .eq("email", email);
 
-      if (existingProfile) {
+      if (existingError) {
+        console.error("Database connection error:", existingError);
+        return NextResponse.json(
+          { error: "Database connection error" },
+          { status: 500 }
+        );
+      }
+
+      if (existingProfiles && existingProfiles.length > 0) {
         return NextResponse.json(
           { error: "User already exists" },
           { status: 400 }
@@ -104,11 +108,7 @@ export async function POST(request: NextRequest) {
           metadata: userData.metadata || {},
         })
         .select()
-        .single()
-        .catch((error) => {
-          console.error("Profile creation connection error:", error);
-          return { data: null, error };
-        });
+        .single();
 
       if (profileError) {
         console.error("Profile creation error:", profileError);
@@ -155,8 +155,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Return the actual error message for debugging
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: error.message || "Internal server error" },
       { status: 500 }
     );
   }
