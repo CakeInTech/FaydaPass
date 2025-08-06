@@ -1,53 +1,58 @@
 "use client";
 
-import { CheckCircle, Building2, Zap, Shield, Users } from "lucide-react";
+import { CheckCircle, Building2, Zap, Shield, Users, Code } from "lucide-react";
 
 export default function Pricing() {
   const plans = [
     {
-      name: "Starter",
+      id: "developer",
+      name: "Developer Plan",
       price: "Free",
-      description: "Perfect for developers and small projects",
+      period: "forever",
+      description: "Perfect for individual developers and small projects",
+      icon: Code,
+      gradient: "from-blue-500 to-purple-600",
       features: [
         "1,000 API calls/month",
-        "Basic KYC verification",
-        "SDK access",
-        "Email support",
+        "Complete SDK access",
         "Sandbox environment",
+        "Community support",
+        "Basic analytics",
+        "Email notifications",
+      ],
+      highlights: [
+        "Instant API access",
+        "No credit card required",
+        "Perfect for testing",
       ],
       cta: "Get Started",
       popular: false,
     },
     {
-      name: "Professional",
+      id: "business",
+      name: "Business Plan",
       price: "$299",
       period: "/month",
-      description: "For growing fintechs and startups",
+      description: "For companies, startups, and production applications",
+      icon: Building2,
+      gradient: "from-green-500 to-blue-600",
       features: [
-        "10,000 API calls/month",
+        "50,000 API calls/month",
         "Advanced KYC features",
         "Webhook support",
         "Priority support",
         "Custom branding",
-        "Analytics dashboard",
+        "Advanced analytics",
+        "Compliance reporting",
+        "Multi-user access",
+      ],
+      highlights: [
+        "Production ready",
+        "Enterprise features",
+        "Dedicated support",
       ],
       cta: "Start Free Trial",
       popular: true,
-    },
-    {
-      name: "Enterprise",
-      price: "Custom",
-      description: "For banks and large institutions",
-      features: [
-        "Unlimited API calls",
-        "Custom compliance",
-        "Dedicated support",
-        "SLA guarantees",
-        "On-premise options",
-        "Custom integrations",
-      ],
-      cta: "Contact Sales",
-      popular: false,
     },
   ];
 
@@ -62,35 +67,38 @@ export default function Pricing() {
       <div className="relative z-20 max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-4">
-            Enterprise Pricing
-          </h2>
+          <h2 className="text-4xl font-bold text-white mb-4">Simple Pricing</h2>
           <p className="text-xl text-white/80 max-w-3xl mx-auto">
-            Choose the plan that fits your business needs. All plans include
-            government-backed KYC verification.
+            Choose the plan that fits your needs. All plans include
+            government-backed KYC verification powered by Fayda eSignet.
           </p>
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {plans.map((plan, index) => (
             <div
-              key={index}
+              key={plan.id}
               className={`relative backdrop-blur-xl bg-white/5 border rounded-2xl p-8 transition-all duration-300 hover:scale-105 ${
                 plan.popular
-                  ? "border-indigo-500/50 shadow-[0_20px_80px_rgba(99,102,241,0.25)]"
+                  ? "border-green-500/50 shadow-[0_20px_80px_rgba(34,197,94,0.25)]"
                   : "border-white/10"
               }`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                  <span className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
                     Most Popular
                   </span>
                 </div>
               )}
 
               <div className="text-center mb-8">
+                <div
+                  className={`w-16 h-16 bg-gradient-to-br ${plan.gradient} rounded-2xl flex items-center justify-center mx-auto mb-4`}
+                >
+                  <plan.icon className="w-8 h-8 text-white" />
+                </div>
                 <h3 className="text-2xl font-bold text-white mb-2">
                   {plan.name}
                 </h3>
@@ -99,10 +107,24 @@ export default function Pricing() {
                     {plan.price}
                   </span>
                   {plan.period && (
-                    <span className="text-white/60 text-lg">{plan.period}</span>
+                    <span className="text-white/60 text-lg ml-1">
+                      {plan.period}
+                    </span>
                   )}
                 </div>
                 <p className="text-white/70">{plan.description}</p>
+              </div>
+
+              {/* Highlights */}
+              <div className="flex flex-wrap justify-center gap-2 mb-6">
+                {plan.highlights.map((highlight, idx) => (
+                  <span
+                    key={idx}
+                    className="bg-white/10 text-white border border-white/20 text-xs px-3 py-1 rounded-full"
+                  >
+                    {highlight}
+                  </span>
+                ))}
               </div>
 
               <ul className="space-y-4 mb-8">
@@ -118,14 +140,14 @@ export default function Pricing() {
               </ul>
 
               <button
-                onClick={() => window.location.href = '/plan-selection'}
+                onClick={() => (window.location.href = "/plan-selection")}
                 className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
                   plan.popular
-                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700"
+                    ? "bg-gradient-to-r from-green-500 to-blue-600 text-white hover:from-green-600 hover:to-blue-700"
                     : "bg-white/10 text-white border border-white/20 hover:bg-white/20"
                 }`}
               >
-                {plan.name === "Enterprise" ? "Contact Sales" : "Choose Plan"}
+                {plan.cta}
               </button>
             </div>
           ))}
@@ -134,29 +156,29 @@ export default function Pricing() {
         {/* Enterprise Features */}
         <div className="mt-20 text-center">
           <h3 className="text-2xl font-bold text-white mb-8">
-            Enterprise Features
+            Why Choose FaydaPass?
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {[
               {
                 icon: <Shield className="w-8 h-8 text-blue-400" />,
-                title: "SOC 2 Compliant",
-                desc: "Bank-grade security standards",
-              },
-              {
-                icon: <Building2 className="w-8 h-8 text-green-400" />,
                 title: "Government Backed",
-                desc: "Powered by Fayda eSignet",
+                desc: "Powered by Ethiopia's official Fayda eSignet system",
               },
               {
                 icon: <Zap className="w-8 h-8 text-yellow-400" />,
-                title: "99.9% Uptime",
-                desc: "Enterprise reliability",
+                title: "Lightning Fast",
+                desc: "Complete KYC verification in under 60 seconds",
               },
               {
-                icon: <Users className="w-8 h-8 text-purple-400" />,
-                title: "24/7 Support",
-                desc: "Dedicated account management",
+                icon: <Users className="w-8 h-8 text-green-400" />,
+                title: "Developer First",
+                desc: "Simple APIs, comprehensive docs, ready-to-use SDKs",
+              },
+              {
+                icon: <Building2 className="w-8 h-8 text-purple-400" />,
+                title: "Enterprise Ready",
+                desc: "SOC 2 compliant with 99.9% uptime guarantee",
               },
             ].map(({ icon, title, desc }, index) => (
               <div key={index} className="text-center">

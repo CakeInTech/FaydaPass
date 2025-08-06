@@ -18,21 +18,22 @@ import {
   Lock,
   Users,
   ArrowRight,
+  Building2,
 } from "lucide-react";
 
 const headings = [
   { id: "about-faydapass", title: "About FaydaPass" },
-  { id: "key-features", title: "Key Features" },
+  { id: "company-registration", title: "Company Registration" },
+  { id: "sdk-overview", title: "SDK Overview" },
   { id: "quick-start", title: "Quick Start" },
   { id: "installation", title: "Installation" },
-  { id: "configuration", title: "Configuration" },
-  { id: "authentication-flow", title: "Authentication Flow" },
+  { id: "authentication", title: "Authentication" },
   { id: "api-reference", title: "API Reference" },
+  { id: "dashboard", title: "Dashboard" },
   { id: "security", title: "Security" },
   { id: "examples", title: "Examples" },
-  { id: "deployment", title: "Deployment" },
   { id: "troubleshooting", title: "Troubleshooting" },
-  { id: "contributing", title: "Contributing" },
+  { id: "support", title: "Support" },
 ];
 
 export default function Page() {
@@ -43,7 +44,7 @@ export default function Page() {
       <DocsLayout>
         <DocsPageHeader
           heading="FaydaPass Documentation"
-          text="The developer-first KYC platform for Ethiopia. Integrate secure identity verification in minutes with our modern OAuth 2.0 + OIDC solution."
+          text="Government-backed KYC verification platform for Ethiopia. Register your company, get API keys, and integrate secure identity verification in minutes."
         />
 
         {/* Status Badges */}
@@ -66,18 +67,17 @@ export default function Page() {
         <section id="about-faydapass" className="mb-12">
           <MdxComponents.h2>About FaydaPass</MdxComponents.h2>
           <MdxComponents.p>
-            FaydaPass is a complete open-source KYC (Know Your Customer)
+            FaydaPass is a government-backed KYC (Know Your Customer)
             verification platform specifically designed for Ethiopian
             businesses. Built on top of the Fayda eSignet infrastructure, it
             provides seamless integration with Ethiopia's national identity
             system.
           </MdxComponents.p>
           <MdxComponents.p>
-            Our platform is designed from the ground up to support modern web
-            applications with{" "}
-            <MdxComponents.a href="https://nextjs.org">Next.js</MdxComponents.a>
-            , serverless architectures, and follows OAuth 2.0 + OpenID Connect
-            standards for maximum security and compatibility.
+            Our platform enables companies and developers to integrate secure
+            identity verification into their applications with simple API calls.
+            Each company gets their own API key, dashboard, and verification
+            tracking.
           </MdxComponents.p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-8">
@@ -92,54 +92,59 @@ export default function Page() {
             </div>
             <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
               <Code className="w-8 h-8 text-green-400 mb-2" />
-              <h4 className="text-white font-semibold mb-1">Developer First</h4>
+              <h4 className="text-white font-semibold mb-1">Simple SDK</h4>
               <p className="text-gray-400 text-sm">
-                Simple APIs, comprehensive docs, ready-to-use examples
+                Easy-to-use JavaScript SDK with comprehensive documentation
               </p>
             </div>
             <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
               <Lock className="w-8 h-8 text-purple-400 mb-2" />
               <h4 className="text-white font-semibold mb-1">
-                Bank-Grade Security
+                Company Dashboard
               </h4>
               <p className="text-gray-400 text-sm">
-                OAuth 2.0, PKCE, JWT, and end-to-end encryption
+                Track verifications, usage stats, and manage your API keys
               </p>
             </div>
           </div>
         </section>
 
-        {/* Key Features */}
-        <section id="key-features" className="mb-12">
-          <MdxComponents.h2>Key Features</MdxComponents.h2>
+        {/* Company Registration */}
+        <section id="company-registration" className="mb-12">
+          <MdxComponents.h2>Company Registration</MdxComponents.h2>
+          <MdxComponents.p>
+            Register your company to get started with FaydaPass. Each company
+            gets their own API key, dashboard, and verification tracking.
+          </MdxComponents.p>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
                 <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <h4 className="text-white font-medium">
-                    Real-time Verification
+                    Company Registration
                   </h4>
                   <p className="text-gray-400 text-sm">
-                    Complete KYC verification in under 60 seconds
+                    Register your company and get instant API access
                   </p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
                 <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="text-white font-medium">OAuth 2.0 + OIDC</h4>
+                  <h4 className="text-white font-medium">API Key Generation</h4>
                   <p className="text-gray-400 text-sm">
-                    Industry standard authentication protocols
+                    Automatic API key generation for secure access
                   </p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
                 <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="text-white font-medium">PKCE Security</h4>
+                  <h4 className="text-white font-medium">Dashboard Access</h4>
                   <p className="text-gray-400 text-sm">
-                    Proof Key for Code Exchange for enhanced security
+                    Track verifications and usage in real-time
                   </p>
                 </div>
               </div>
@@ -148,11 +153,102 @@ export default function Page() {
               <div className="flex items-start space-x-3">
                 <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="text-white font-medium">
-                    Multi-language Support
-                  </h4>
+                  <h4 className="text-white font-medium">Developer Plans</h4>
                   <p className="text-gray-400 text-sm">
-                    Handles both English and Amharic user data
+                    Free developer plan for testing and development
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Business Plans</h4>
+                  <p className="text-gray-400 text-sm">
+                    Production-ready plans with higher limits
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Usage Tracking</h4>
+                  <p className="text-gray-400 text-sm">
+                    Monitor API usage and verification success rates
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6 my-6">
+            <h4 className="text-white font-semibold mb-3 flex items-center">
+              <Building2 className="w-5 h-5 mr-2 text-blue-400" />
+              Registration Process
+            </h4>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-3">
+                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                  1
+                </div>
+                <span className="text-white">
+                  Visit{" "}
+                  <code className="bg-gray-800 px-2 py-1 rounded">
+                    /signup?plan=business
+                  </code>
+                </span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                  2
+                </div>
+                <span className="text-white">
+                  Fill in company details and choose plan
+                </span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                  3
+                </div>
+                <span className="text-white">Get your API key instantly</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                  4
+                </div>
+                <span className="text-white">
+                  Start integrating with our SDK
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SDK Overview */}
+        <section id="sdk-overview" className="mb-12">
+          <MdxComponents.h2>SDK Overview</MdxComponents.h2>
+          <MdxComponents.p>
+            The FaydaPass SDK provides a simple way to integrate KYC
+            verification into your applications. It handles authentication,
+            verification initiation, and status checking.
+          </MdxComponents.p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Easy Integration</h4>
+                  <p className="text-gray-400 text-sm">
+                    Simple JavaScript SDK with comprehensive documentation
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">API Key Validation</h4>
+                  <p className="text-gray-400 text-sm">
+                    Automatic validation of company API keys
                   </p>
                 </div>
               </div>
@@ -160,10 +256,21 @@ export default function Page() {
                 <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <h4 className="text-white font-medium">
-                    Mobile-First Design
+                    Verification Tracking
                   </h4>
                   <p className="text-gray-400 text-sm">
-                    Fully responsive across all device sizes
+                    Track verification status and results
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Error Handling</h4>
+                  <p className="text-gray-400 text-sm">
+                    Comprehensive error handling with detailed messages
                   </p>
                 </div>
               </div>
@@ -176,6 +283,54 @@ export default function Page() {
                   </p>
                 </div>
               </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Usage Statistics</h4>
+                  <p className="text-gray-400 text-sm">
+                    Monitor API usage and performance metrics
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6 my-6">
+            <h4 className="text-white font-semibold mb-3 flex items-center">
+              <Code className="w-5 h-5 mr-2 text-green-400" />
+              SDK Features
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span className="text-white text-sm">API Key Validation</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span className="text-white text-sm">
+                    Verification Initiation
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span className="text-white text-sm">Status Checking</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span className="text-white text-sm">Usage Statistics</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span className="text-white text-sm">Error Handling</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span className="text-white text-sm">TypeScript Support</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -184,138 +339,157 @@ export default function Page() {
         <section id="quick-start" className="mb-12">
           <MdxComponents.h2>Quick Start</MdxComponents.h2>
           <MdxComponents.p>
-            Get up and running with FaydaPass in less than 5 minutes. This guide
-            will walk you through the basic setup.
+            Get up and running with FaydaPass SDK in less than 5 minutes. This
+            guide will walk you through the basic setup and integration.
           </MdxComponents.p>
 
           <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-6 my-6">
             <h4 className="text-white font-semibold mb-4 flex items-center">
               <Zap className="w-4 h-4 mr-2 text-yellow-400" />
-              Test Credentials
+              Prerequisites
             </h4>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-400">FIN:</span>
-                <code className="text-green-400 bg-gray-800 px-2 py-1 rounded">
-                  6140798523917519
-                </code>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-4 h-4 text-green-400" />
+                <span className="text-white">
+                  Company registration completed
+                </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">OTP:</span>
-                <code className="text-green-400 bg-gray-800 px-2 py-1 rounded">
-                  111111
-                </code>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-4 h-4 text-green-400" />
+                <span className="text-white">API key from your dashboard</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-4 h-4 text-green-400" />
+                <span className="text-white">Node.js 18+ installed</span>
               </div>
             </div>
           </div>
 
+          <MdxComponents.h3>1. Install the SDK</MdxComponents.h3>
           <CodeBlock
             language="bash"
-            code={`# Clone the repository
-git clone https://github.com/CakeInTech/faydapass.git
-cd faydapass
+            code={`# Using npm
+npm install @faydapass/sdk
 
-# Install dependencies
-npm install
+# Using yarn
+yarn add @faydapass/sdk
 
-# Set up environment variables
-cp .env.example .env.local
-
-# Start development server
-npm run dev`}
+# Using pnpm
+pnpm add @faydapass/sdk`}
           />
+
+          <MdxComponents.h3>2. Initialize the SDK</MdxComponents.h3>
+          <CodeBlock
+            language="javascript"
+            code={`import { FaydaPass } from '@faydapass/sdk';
+
+const faydapass = new FaydaPass({
+  apiKey: 'your_api_key_here',
+  baseUrl: 'https://api.faydapass.com',
+  timeout: 30000,
+});`}
+          />
+
+          <MdxComponents.h3>3. Initiate a Verification</MdxComponents.h3>
+          <CodeBlock
+            language="javascript"
+            code={`// Initiate a KYC verification
+const verification = await faydapass.initiateVerification({
+  userEmail: 'user@example.com',
+  redirectUrl: 'https://yourapp.com/callback',
+  metadata: {
+    source: 'web_app',
+    user_id: '12345',
+  },
+});
+
+console.log('Verification ID:', verification.verificationId);
+console.log('Auth URL:', verification.authUrl);`}
+          />
+
+          <MdxComponents.h3>4. Check Verification Status</MdxComponents.h3>
+          <CodeBlock
+            language="javascript"
+            code={`// Check verification status
+const status = await faydapass.getVerificationStatus(verification.verificationId);
+console.log('Status:', status.status);
+console.log('Fayda ID:', status.faydaId);`}
+          />
+
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6 my-6">
+            <h4 className="text-white font-semibold mb-3 flex items-center">
+              <Code className="w-4 h-4 mr-2 text-blue-400" />
+              Test Your Integration
+            </h4>
+            <p className="text-white text-sm mb-3">
+              Use our SDK test page to verify your integration:
+            </p>
+            <a
+              href="/sdk-test"
+              className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              <Code className="w-4 h-4" />
+              <span>Test SDK</span>
+            </a>
+          </div>
         </section>
 
         {/* Installation */}
         <section id="installation" className="mb-12">
           <MdxComponents.h2>Installation</MdxComponents.h2>
           <MdxComponents.p>
-            FaydaPass can be installed in multiple ways depending on your
-            project setup.
+            Install the FaydaPass SDK in your project to start integrating KYC
+            verification.
           </MdxComponents.p>
 
           <MdxComponents.h3>Using npm</MdxComponents.h3>
-          <CodeBlock
-            language="bash"
-            code="npm install @faydapass/core @faydapass/nextjs"
-          />
+          <CodeBlock language="bash" code="npm install @faydapass/sdk" />
 
           <MdxComponents.h3>Using yarn</MdxComponents.h3>
-          <CodeBlock
-            language="bash"
-            code="yarn add @faydapass/core @faydapass/nextjs"
-          />
+          <CodeBlock language="bash" code="yarn add @faydapass/sdk" />
 
-          <MdxComponents.h3>Using the Template</MdxComponents.h3>
-          <CodeBlock
-            language="bash"
-            code="npx create-faydapass-app my-kyc-app"
-          />
-        </section>
+          <MdxComponents.h3>Using pnpm</MdxComponents.h3>
+          <CodeBlock language="bash" code="pnpm add @faydapass/sdk" />
 
-        {/* Configuration */}
-        <section id="configuration" className="mb-12">
-          <MdxComponents.h2>Configuration</MdxComponents.h2>
-          <MdxComponents.p>
-            Configure your environment variables to connect with the Fayda
-            eSignet system.
-          </MdxComponents.p>
-
-          <CodeBlock
-            language="bash"
-            filename=".env.local"
-            code={`# Fayda eSignet OIDC Configuration
-NEXT_PUBLIC_CLIENT_ID=your_client_id
-NEXT_PUBLIC_REDIRECT_URI=http://localhost:3000/callback
-NEXT_PUBLIC_AUTHORIZATION_ENDPOINT=https://esignet.ida.fayda.et/authorize
-NEXT_PUBLIC_TOKEN_ENDPOINT=https://esignet.ida.fayda.et/v1/esignet/oauth/v2/token
-NEXT_PUBLIC_USERINFO_ENDPOINT=https://esignet.ida.fayda.et/v1/esignet/oidc/userinfo
-
-# JWT Signing (Required for client assertion)
-PRIVATE_KEY=your_base64_encoded_jwk_private_key
-
-# App Configuration
-NEXT_PUBLIC_BASE_URL=http://localhost:3000`}
-          />
-
-          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 my-6">
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 my-6">
             <div className="flex items-start space-x-3">
-              <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-black text-xs font-bold">!</span>
+              <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-white text-xs font-bold">i</span>
               </div>
               <div>
-                <h4 className="text-yellow-400 font-medium mb-1">Important</h4>
-                <p className="text-yellow-200 text-sm">
-                  Never commit your private keys or sensitive credentials to
-                  version control. Use environment variables and keep your{" "}
-                  <code>.env.local</code> file in your <code>.gitignore</code>.
+                <h4 className="text-blue-400 font-medium mb-1">Note</h4>
+                <p className="text-blue-200 text-sm">
+                  Make sure you have registered your company and obtained an API
+                  key before installing the SDK. You can register at{" "}
+                  <code>/signup?plan=business</code>.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Authentication Flow */}
-        <section id="authentication-flow" className="mb-12">
-          <MdxComponents.h2>Authentication Flow</MdxComponents.h2>
+        {/* Authentication */}
+        <section id="authentication" className="mb-12">
+          <MdxComponents.h2>Authentication</MdxComponents.h2>
           <MdxComponents.p>
-            FaydaPass implements the complete OAuth 2.0 + OIDC flow with PKCE
-            for maximum security.
+            FaydaPass uses API key authentication for secure access to the
+            verification services.
           </MdxComponents.p>
 
           <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-6 my-6">
-            <h4 className="text-white font-semibold mb-4">Flow Overview</h4>
+            <h4 className="text-white font-semibold mb-4">
+              Authentication Flow
+            </h4>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
                   1
                 </div>
                 <div>
-                  <h5 className="text-white font-medium">
-                    Authorization Request
-                  </h5>
+                  <h5 className="text-white font-medium">Register Company</h5>
                   <p className="text-gray-400 text-sm">
-                    Generate PKCE parameters and redirect to Fayda
+                    Register your company to get an API key
                   </p>
                 </div>
               </div>
@@ -324,11 +498,9 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000`}
                   2
                 </div>
                 <div>
-                  <h5 className="text-white font-medium">
-                    User Authentication
-                  </h5>
+                  <h5 className="text-white font-medium">Initialize SDK</h5>
                   <p className="text-gray-400 text-sm">
-                    User authenticates with Fayda eSignet
+                    Initialize the SDK with your API key
                   </p>
                 </div>
               </div>
@@ -337,11 +509,9 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000`}
                   3
                 </div>
                 <div>
-                  <h5 className="text-white font-medium">
-                    Callback Processing
-                  </h5>
+                  <h5 className="text-white font-medium">Validate API Key</h5>
                   <p className="text-gray-400 text-sm">
-                    Handle OAuth callback and validate state
+                    Validate your API key before making requests
                   </p>
                 </div>
               </div>
@@ -350,22 +520,9 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000`}
                   4
                 </div>
                 <div>
-                  <h5 className="text-white font-medium">Token Exchange</h5>
+                  <h5 className="text-white font-medium">Make Requests</h5>
                   <p className="text-gray-400 text-sm">
-                    Exchange authorization code for access token
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                  5
-                </div>
-                <div>
-                  <h5 className="text-white font-medium">
-                    User Info Retrieval
-                  </h5>
-                  <p className="text-gray-400 text-sm">
-                    Fetch verified user data from Fayda
+                    Use the SDK to initiate verifications and check status
                   </p>
                 </div>
               </div>
@@ -373,107 +530,246 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000`}
           </div>
 
           <CodeBlock
-            language="typescript"
-            filename="pages/api/auth/verify.ts"
-            code={`import { generateCodeVerifier, generateCodeChallenge } from '@faydapass/core'
+            language="javascript"
+            filename="example.js"
+            code={`import { FaydaPass } from '@faydapass/sdk';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Generate PKCE parameters
-  const codeVerifier = generateCodeVerifier()
-  const codeChallenge = await generateCodeChallenge(codeVerifier)
-  const state = generateCodeVerifier()
+// Initialize with your API key
+const faydapass = new FaydaPass({
+  apiKey: 'your_api_key_here',
+  baseUrl: 'https://api.faydapass.com',
+  timeout: 30000,
+});
 
-  // Store PKCE parameters
-  req.session.codeVerifier = codeVerifier
-  req.session.state = state
-
-  // Build authorization URL
-  const authUrl = new URL(process.env.NEXT_PUBLIC_AUTHORIZATION_ENDPOINT!)
-  authUrl.searchParams.set('response_type', 'code')
-  authUrl.searchParams.set('client_id', process.env.NEXT_PUBLIC_CLIENT_ID!)
-  authUrl.searchParams.set('redirect_uri', process.env.NEXT_PUBLIC_REDIRECT_URI!)
-  authUrl.searchParams.set('scope', 'openid profile email phone address')
-  authUrl.searchParams.set('code_challenge', codeChallenge)
-  authUrl.searchParams.set('code_challenge_method', 'S256')
-  authUrl.searchParams.set('state', state)
-
-  res.redirect(authUrl.toString())
+// Validate your API key
+const validation = await faydapass.validateApiKey();
+if (validation.valid) {
+  console.log('API key is valid');
+  console.log('Plan:', validation.plan);
+  console.log('Company:', validation.company?.name);
+} else {
+  console.error('Invalid API key');
 }`}
           />
+        </section>
+
+        {/* Dashboard */}
+        <section id="dashboard" className="mb-12">
+          <MdxComponents.h2>Dashboard</MdxComponents.h2>
+          <MdxComponents.p>
+            Each registered company gets access to a comprehensive dashboard to
+            track verifications, monitor usage, and manage their API keys.
+          </MdxComponents.p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">
+                    Verification Tracking
+                  </h4>
+                  <p className="text-gray-400 text-sm">
+                    View all verifications with status and results
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Usage Statistics</h4>
+                  <p className="text-gray-400 text-sm">
+                    Monitor API calls, success rates, and performance
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">API Key Management</h4>
+                  <p className="text-gray-400 text-sm">
+                    View and regenerate your API keys securely
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Real-time Updates</h4>
+                  <p className="text-gray-400 text-sm">
+                    Get instant notifications for verification status changes
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Export Data</h4>
+                  <p className="text-gray-400 text-sm">
+                    Export verification data for reporting and analysis
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Plan Management</h4>
+                  <p className="text-gray-400 text-sm">
+                    Upgrade your plan and manage billing information
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-6 my-6">
+            <h4 className="text-white font-semibold mb-3 flex items-center">
+              <Users className="w-5 h-5 mr-2 text-purple-400" />
+              Dashboard Features
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span className="text-white text-sm">
+                    Verification History
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span className="text-white text-sm">
+                    Success Rate Analytics
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span className="text-white text-sm">API Usage Metrics</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span className="text-white text-sm">
+                    Real-time Notifications
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span className="text-white text-sm">Data Export</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span className="text-white text-sm">Plan Management</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* API Reference */}
         <section id="api-reference" className="mb-12">
           <MdxComponents.h2>API Reference</MdxComponents.h2>
           <MdxComponents.p>
-            Complete reference for all FaydaPass API endpoints and methods.
+            Complete reference for all FaydaPass SDK methods and API endpoints.
           </MdxComponents.p>
 
           <div className="space-y-6">
             <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-white font-semibold">POST /api/token</h4>
+                <h4 className="text-white font-semibold">
+                  initiateVerification()
+                </h4>
                 <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                  Required
+                  Core Method
                 </Badge>
               </div>
               <p className="text-gray-400 text-sm mb-4">
-                Exchange authorization code for access token
+                Initiate a new KYC verification for a user
               </p>
 
-              <h5 className="text-white font-medium mb-2">Request Body</h5>
+              <h5 className="text-white font-medium mb-2">Parameters</h5>
               <CodeBlock
-                language="json"
-                code={`{
-  "code": "authorization_code_from_callback",
-  "code_verifier": "pkce_code_verifier",
-  "client_id": "your_client_id",
-  "redirect_uri": "your_redirect_uri"
+                language="typescript"
+                code={`interface VerificationRequest {
+  userEmail: string;
+  redirectUrl?: string;
+  metadata?: Record<string, any>;
 }`}
               />
 
               <h5 className="text-white font-medium mb-2 mt-4">Response</h5>
               <CodeBlock
-                language="json"
-                code={`{
-  "access_token": "eyJhbGciOiJSUzI1NiIs...",
-  "token_type": "Bearer",
-  "expires_in": 3600,
-  "id_token": "eyJhbGciOiJSUzI1NiIs..."
+                language="typescript"
+                code={`interface VerificationResponse {
+  verificationId: string;
+  authUrl: string;
+  status: 'pending' | 'processing' | 'success' | 'failed';
+  createdAt: string;
 }`}
               />
             </div>
 
             <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-white font-semibold">GET /api/userinfo</h4>
+                <h4 className="text-white font-semibold">
+                  getVerificationStatus()
+                </h4>
                 <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                  Protected
+                  Status Check
                 </Badge>
               </div>
               <p className="text-gray-400 text-sm mb-4">
-                Retrieve verified user information
+                Check the status of a verification
               </p>
 
-              <h5 className="text-white font-medium mb-2">Headers</h5>
+              <h5 className="text-white font-medium mb-2">Parameters</h5>
               <CodeBlock
-                language="http"
-                code="Authorization: Bearer {access_token}"
+                language="typescript"
+                code={`verificationId: string`}
               />
 
               <h5 className="text-white font-medium mb-2 mt-4">Response</h5>
               <CodeBlock
-                language="json"
-                code={`{
-  "sub": "user_unique_identifier",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "phone_number": "+251911234567",
-  "email_verified": true,
-  "phone_number_verified": true,
-  "name_en": "John Doe",
-  "name_am": "ጆን ዶ",
-  "fayda_id": "unique_fayda_identifier"
+                language="typescript"
+                code={`interface VerificationStatus {
+  verificationId: string;
+  status: 'pending' | 'processing' | 'success' | 'failed';
+  userEmail: string;
+  faydaId?: string;
+  verifiedAt?: string;
+  metadata?: Record<string, any>;
+  error?: string;
+}`}
+              />
+            </div>
+
+            <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-white font-semibold">validateApiKey()</h4>
+                <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                  Authentication
+                </Badge>
+              </div>
+              <p className="text-gray-400 text-sm mb-4">
+                Validate your API key and get account information
+              </p>
+
+              <h5 className="text-white font-medium mb-2 mt-4">Response</h5>
+              <CodeBlock
+                language="typescript"
+                code={`interface ApiKeyValidation {
+  valid: boolean;
+  plan: string;
+  permissions: string[];
+  company?: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    plan_type: string;
+  };
 }`}
               />
             </div>
@@ -827,37 +1123,113 @@ CMD ["node", "server.js"]`}
           </div>
         </section>
 
-        {/* Contributing */}
-        <section id="contributing" className="mb-12">
-          <MdxComponents.h2>Contributing</MdxComponents.h2>
+        {/* Support */}
+        <section id="support" className="mb-12">
+          <MdxComponents.h2>Support</MdxComponents.h2>
           <MdxComponents.p>
-            We welcome contributions from the community! Here's how you can help
-            improve FaydaPass.
+            Get help with FaydaPass integration, troubleshooting, and technical
+            support.
           </MdxComponents.p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">SDK Test Page</h4>
+                  <p className="text-gray-400 text-sm">
+                    Test your SDK integration with our interactive test page
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Documentation</h4>
+                  <p className="text-gray-400 text-sm">
+                    Comprehensive guides and API reference
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Dashboard Support</h4>
+                  <p className="text-gray-400 text-sm">
+                    Get help with dashboard features and usage
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Error Handling</h4>
+                  <p className="text-gray-400 text-sm">
+                    Detailed error messages and troubleshooting guides
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Best Practices</h4>
+                  <p className="text-gray-400 text-sm">
+                    Security guidelines and integration tips
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-white font-medium">Community</h4>
+                  <p className="text-gray-400 text-sm">
+                    Join our community for discussions and updates
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg p-6 my-6">
             <h4 className="text-white font-semibold mb-3 flex items-center">
               <Users className="w-5 h-5 mr-2 text-blue-400" />
-              Ways to Contribute
+              Get Help
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="w-4 h-4 text-green-400" />
                   <span className="text-white text-sm">
-                    Report bugs and issues
+                    <a
+                      href="/sdk-test"
+                      className="text-blue-400 hover:text-blue-300"
+                    >
+                      SDK Test Page
+                    </a>
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="w-4 h-4 text-green-400" />
                   <span className="text-white text-sm">
-                    Suggest new features
+                    <a
+                      href="/signup?plan=business"
+                      className="text-blue-400 hover:text-blue-300"
+                    >
+                      Company Registration
+                    </a>
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="w-4 h-4 text-green-400" />
                   <span className="text-white text-sm">
-                    Improve documentation
+                    <a
+                      href="/dashboard"
+                      className="text-blue-400 hover:text-blue-300"
+                    >
+                      Dashboard
+                    </a>
                   </span>
                 </div>
               </div>
@@ -865,46 +1237,47 @@ CMD ["node", "server.js"]`}
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="w-4 h-4 text-green-400" />
                   <span className="text-white text-sm">
-                    Submit pull requests
+                    <a
+                      href="mailto:support@faydapass.com"
+                      className="text-blue-400 hover:text-blue-300"
+                    >
+                      Email Support
+                    </a>
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="w-4 h-4 text-green-400" />
-                  <span className="text-white text-sm">Write tests</span>
+                  <span className="text-white text-sm">
+                    <a
+                      href="https://github.com/CakeInTech/faydapass"
+                      className="text-blue-400 hover:text-blue-300"
+                    >
+                      GitHub Issues
+                    </a>
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="w-4 h-4 text-green-400" />
-                  <span className="text-white text-sm">Share examples</span>
+                  <span className="text-white text-sm">
+                    <a
+                      href="https://docs.faydapass.com"
+                      className="text-blue-400 hover:text-blue-300"
+                    >
+                      Full Documentation
+                    </a>
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          <CodeBlock
-            language="bash"
-            code={`# Fork the repository and clone it
-git clone https://github.com/yourusername/faydapass.git
-cd faydapass
-
-# Create a new branch for your feature
-git checkout -b feature/amazing-feature
-
-# Make your changes and commit them
-git commit -m 'Add amazing feature'
-
-# Push to your fork and submit a pull request
-git push origin feature/amazing-feature`}
-          />
-
           <div className="flex items-center justify-center mt-8">
             <a
-              href="https://github.com/CakeInTech/faydapass"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center space-x-2 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105"
+              href="/sdk-test"
+              className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105"
             >
               <Code className="w-5 h-5" />
-              <span>View on GitHub</span>
+              <span>Test Your SDK</span>
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>
